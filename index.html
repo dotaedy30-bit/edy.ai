@@ -1364,7 +1364,7 @@
 
     <script>
         (function() {
-            const API_URL = 'https://348074cb-4902-45c4-a70c-4e264b61b9cc-00-1xfwwya32nsgw.riker.replit.dev/api/chat';
+            const API_URL = 'https://minha-ai-u0zy.onrender.com/api/chat';
 
             const particlesCanvas = document.getElementById('particles-canvas');
             const ctx = particlesCanvas.getContext('2d');
@@ -1389,7 +1389,7 @@
             let calcExpression = '';
             let calcResultShown = false;
             let isWaitingForResponse = false;
-            let sessionId = null;
+            let chatHistory = [];
             let recognition = null;
             let isListening = false;
 
@@ -1829,6 +1829,7 @@
                 const initialText =
                     'Olá! Eu sou o Edy Marques.ai, sua inteligência artificial especializada em estudos para concursos, produtividade e aprendizado. Como posso ajudar você hoje?';
                 addMessage(initialText, 'ai');
+                chatHistory.push({ role: 'assistant', content: initialText });
             }
 
             async function sendMessage() {
@@ -1839,6 +1840,7 @@
 
                 chatInput.value = '';
                 addMessage(message, 'user');
+                chatHistory.push({ role: 'user', content: message });
                 showTypingIndicator();
                 isWaitingForResponse = true;
                 sendBtn.style.opacity = '0.5';
@@ -1847,10 +1849,10 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 18000);
 
-                const requestBody = { message: message };
-                if (sessionId) {
-                    requestBody.sessionId = sessionId;
-                }
+                const requestBody = {
+                    message: message,
+                    history: chatHistory.slice(0, -1)
+                };
 
                 try {
                     const response = await fetch(API_URL, {
@@ -1868,15 +1870,14 @@
                     const data = await response.json();
                     hideTypingIndicator();
 
-                    if (data && data.reply && typeof data.reply === 'string' && data.reply.trim()) {
-                        addMessage(data.reply.trim(), 'ai');
-                        if (data.sessionId) {
-                            sessionId = data.sessionId;
-                        }
+                    if (data && data.response && typeof data.response === 'string' && data.response.trim()) {
+                        addMessage(data.response.trim(), 'ai');
+                        chatHistory.push({ role: 'assistant', content: data.response.trim() });
                     } else {
                         addMessage(
                             'Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?',
                             'ai');
+                        chatHistory.push({ role: 'assistant', content: 'Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?' });
                     }
                 } catch (err) {
                     clearTimeout(timeoutId);
@@ -1889,6 +1890,7 @@
                             'A resposta está demorando mais do que o esperado. Por favor, tente novamente.';
                     }
                     addMessage(errorMsg, 'ai');
+                    chatHistory.push({ role: 'assistant', content: errorMsg });
                 } finally {
                     isWaitingForResponse = false;
                     sendBtn.style.opacity = '1';
