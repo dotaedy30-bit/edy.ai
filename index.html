@@ -1,1948 +1,1565 @@
+<!-- REDESIGN GEMINI - BACKEND INTACTO (RESTAURADO) -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edy Marques.ai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Display:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* = INÍCIO REDESIGN GEMINI = */
         :root {
-            --bg-deep: #080c14;
-            --bg-dark: #0d1220;
-            --bg-panel: #111827;
-            --bg-card: #161e2e;
-            --neon-blue: #4da8da;
-            --neon-cyan: #5ce0d6;
-            --neon-green: #4ade80;
-            --neon-purple: #818cf8;
-            --text-primary: #e8eaed;
-            --text-secondary: #b0b8c4;
-            --text-muted: #7a8494;
-            --glass-bg: rgba(18, 24, 40, 0.8);
-            --glass-border: rgba(100, 180, 220, 0.18);
-            --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-            --glow-soft: 0 0 20px rgba(77, 168, 218, 0.25);
-            --glow-medium: 0 0 35px rgba(77, 168, 218, 0.4);
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 22px;
-            --radius-xl: 28px;
-            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-sans: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Fira Code', monospace;
-            --header-height: 60px;
-            --sidebar-width: 300px;
+            --bg-base: #131314;
+            --bg-surface: #1E1F20;
+            --bg-elevated: #282A2C;
+            --bg-input: #1E1F20;
+            --bg-sidebar: #1A1B1E;
+            --bg-user-msg: #2A2B2D;
+            --bg-bot-msg: #1E1F20;
+            --accent-blue: #8AB4F8;
+            --accent-purple: #C58AF9;
+            --accent-teal: #78C8C0;
+            --gradient-main: linear-gradient(135deg, #8AB4F8, #C58AF9);
+            --gradient-glow: linear-gradient(135deg, rgba(138,180,248,0.15), rgba(197,138,249,0.15));
+            --text-primary: #E8EAED;
+            --text-secondary: #9AA0A6;
+            --text-muted: #5F6368;
+            --border-subtle: rgba(255,255,255,0.08);
+            --border-focus: rgba(138,180,248,0.6);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --radius-pill: 9999px;
+            --sidebar-width: 280px;
+            --header-height: 58px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Google Sans', system-ui, -apple-system, sans-serif;
+            --font-display: 'Google Sans Display', 'Google Sans', sans-serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
         }
 
-        html {
-            font-size: 16px;
-            -webkit-tap-highlight-color: transparent;
-        }
+        html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: var(--font-sans);
-            background: var(--bg-deep);
+            font-family: var(--font);
+            background: var(--bg-base);
             color: var(--text-primary);
             height: 100dvh;
             width: 100vw;
             overflow: hidden;
-            position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             user-select: none;
         }
 
-        #bg-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://res.cloudinary.com/dfv4cy1ed/image/upload/v1778742659/fundoChat_h9axi2.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.12;
-            filter: blur(6px);
-            z-index: 0;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        /* ─── RIPPLE EFFECT ─── */
+        .ripple-host { position: relative; overflow: hidden; }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            transform: scale(0);
+            animation: rippleAnim 0.5s linear;
             pointer-events: none;
         }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
 
+        /* ─── SPLASH SCREEN ─── */
         #splash-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: radial-gradient(ellipse at center, #0d1a2d 0%, #060a13 70%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 28px;
-            transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.7s;
-            opacity: 1;
-            visibility: visible;
+            position: fixed; inset: 0; z-index: 200;
+            background: radial-gradient(ellipse at 50% 40%, #1C1C2E 0%, #0D0D0F 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 24px;
+            transition: opacity 0.6s var(--transition-slow), visibility 0.6s;
         }
-        #splash-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+        #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .splash-gem {
+            width: 80px; height: 80px;
+            animation: gemFloat 3s ease-in-out infinite;
         }
-        #splash-screen .splash-logo {
-            width: 90px;
-            height: 90px;
-            animation: splashPulse 3s ease-in-out infinite;
+        @keyframes gemFloat {
+            0%,100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 20px rgba(138,180,248,0.5)); }
+            50% { transform: translateY(-8px) scale(1.04); filter: drop-shadow(0 0 36px rgba(197,138,249,0.65)); }
         }
-        @keyframes splashPulse {
-            0%,
-            100% {
-                filter: drop-shadow(0 0 18px rgba(92, 224, 214, 0.6)) drop-shadow(0 0 36px rgba(77, 168, 218, 0.4));
-                transform: scale(1);
-            }
-            50% {
-                filter: drop-shadow(0 0 32px rgba(92, 224, 214, 0.9)) drop-shadow(0 0 54px rgba(77, 168, 218, 0.65));
-                transform: scale(1.06);
-            }
-        }
-        #splash-screen .splash-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #5ce0d6, #4da8da, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
+
+        .splash-title {
+            font-family: var(--font-display);
+            font-size: 2rem; font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: transparent;
-            filter: drop-shadow(0 0 18px rgba(92, 224, 214, 0.5));
-            text-align: center;
-            padding: 0 20px;
+            letter-spacing: -0.5px; text-align: center;
         }
-        #splash-screen .splash-subtitle {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 360px;
-            line-height: 1.5;
-            letter-spacing: -0.1px;
-            padding: 0 20px;
+        .splash-sub {
+            font-size: 0.95rem; color: var(--text-secondary);
+            text-align: center; max-width: 320px; line-height: 1.5;
         }
-        #splash-screen .splash-btn {
-            padding: 14px 44px;
-            border-radius: 30px;
-            border: 1px solid rgba(92, 224, 214, 0.5);
-            background: linear-gradient(135deg, #1a3a4a, #0f2835);
-            color: #5ce0d6;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: -0.1px;
-            transition: var(--transition-fast);
-            font-family: var(--font-sans);
-            box-shadow: 0 0 22px rgba(92, 224, 214, 0.25);
-            position: relative;
+        .splash-btn {
+            padding: 14px 48px; border-radius: var(--radius-pill);
+            border: none; cursor: pointer; font-family: var(--font);
+            font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2px;
+            background: var(--gradient-main); color: #13131A;
+            transition: var(--transition); box-shadow: 0 0 30px rgba(138,180,248,0.3);
+        }
+        .splash-btn:hover { transform: scale(1.04); box-shadow: 0 0 44px rgba(197,138,249,0.45); }
+        .splash-btn:active { transform: scale(0.97); }
+        .splash-google-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 26px; border-radius: var(--radius-pill);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-primary); font-family: var(--font);
+            font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            transition: var(--transition); backdrop-filter: blur(12px);
+        }
+        .splash-google-btn:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .splash-google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* ─── SIDEBAR ─── */
+        #sidebar-overlay {
+            position: fixed; inset: 0; z-index: 15;
+            background: rgba(0,0,0,0.5);
+            opacity: 0; pointer-events: none;
+            transition: opacity var(--transition-slow);
+        }
+        #sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+        #sidebar {
+            position: fixed; top: 0; left: 0; height: 100%;
+            width: var(--sidebar-width); max-width: 88vw;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            z-index: 20;
+            transform: translateX(-105%);
+            transition: transform var(--transition-slow);
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 40px rgba(0,0,0,0.5);
+        }
+        #sidebar.open { transform: translateX(0); }
+
+        @media (min-width: 1024px) {
+            #sidebar { transform: translateX(0); position: fixed; }
+            #sidebar-overlay { display: none !important; }
+            #chat-container { left: var(--sidebar-width) !important; }
+            #input-area { left: var(--sidebar-width) !important; }
+            #hamburger { display: none !important; }
+        }
+
+        .sidebar-header {
+            padding: 18px 16px 12px;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .sidebar-logo-mark {
+            width: 32px; height: 32px; flex-shrink: 0;
+        }
+        .sidebar-brand {
+            font-family: var(--font-display);
+            font-size: 1rem; font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-new-chat {
+            margin: 14px 14px 8px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px; border-radius: var(--radius-pill);
+            background: var(--gradient-glow);
+            border: 1px solid rgba(138,180,248,0.2);
+            color: var(--accent-blue); cursor: pointer;
+            font-family: var(--font); font-size: 0.9rem; font-weight: 600;
+            transition: var(--transition); text-align: left;
+        }
+        .sidebar-new-chat:hover {
+            background: linear-gradient(135deg, rgba(138,180,248,0.22), rgba(197,138,249,0.22));
+            border-color: rgba(138,180,248,0.4);
+            box-shadow: 0 0 20px rgba(138,180,248,0.2);
+        }
+        .sidebar-new-chat svg {
+            width: 18px; height: 18px; flex-shrink: 0;
+            stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .sidebar-section-label {
+            padding: 14px 18px 6px;
+            font-size: 0.72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .sidebar-chat-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 18px; cursor: pointer;
+            color: var(--text-secondary); font-size: 0.88rem;
+            transition: var(--transition); border-radius: 0;
             overflow: hidden;
         }
-        #splash-screen .splash-btn:hover {
-            background: linear-gradient(135deg, #1f4558, #123040);
-            border-color: rgba(92, 224, 214, 0.7);
-            box-shadow: 0 0 38px rgba(92, 224, 214, 0.45);
-            transform: scale(1.04);
-        }
-        #splash-screen .splash-btn:active {
-            transform: scale(0.95);
-        }
-        #splash-screen .splash-google-btn {
-            padding: 12px 28px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.04);
+        .sidebar-chat-item:hover {
+            background: rgba(255,255,255,0.05);
             color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            letter-spacing: -0.1px;
-            transition: var(--transition-fast);
-            font-family: var(--font-sans);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
-        #splash-screen .splash-google-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+        .sidebar-chat-item svg {
+            width: 16px; height: 16px; flex-shrink: 0;
+            stroke: currentColor; fill: none; stroke-width: 1.8;
+            stroke-linecap: round; stroke-linejoin: round; opacity: 0.6;
         }
-        #splash-screen .splash-google-btn svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
+        .sidebar-chat-item span {
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
+        .sidebar-spacer { flex: 1; }
+
+        .sidebar-plus-btn {
+            margin: 8px 14px 4px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 18px; border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #8AB4F8, #C58AF9);
+            border: none; cursor: pointer; font-family: var(--font);
+            font-size: 0.9rem; font-weight: 700; color: #13131A;
+            transition: var(--transition); box-shadow: 0 0 24px rgba(197,138,249,0.3);
+        }
+        .sidebar-plus-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 30px rgba(197,138,249,0.45);
+        }
+        .sidebar-plus-btn svg {
+            width: 18px; height: 18px; flex-shrink: 0;
+            stroke: currentColor; fill: none; stroke-width: 2.5;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .sidebar-divider { height: 1px; background: var(--border-subtle); margin: 6px 14px; }
+
+        .sidebar-footer {
+            padding: 6px 6px 14px;
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .sidebar-footer-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: var(--radius-sm);
+            color: var(--text-secondary); font-size: 0.88rem; cursor: pointer;
+            transition: var(--transition); text-decoration: none;
+        }
+        .sidebar-footer-item:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .sidebar-footer-item svg {
+            width: 18px; height: 18px; flex-shrink: 0;
+            stroke: currentColor; fill: none; stroke-width: 1.8;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+        .sidebar-footer-item.whatsapp:hover { color: #25d366; }
+        .sidebar-footer-item.instagram:hover { color: #e1306c; }
+
+        /* ─── HEADER ─── */
         #header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            position: fixed; top: 0; left: 0; right: 0;
             height: var(--header-height);
-            background: rgba(10, 14, 22, 0.75);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            padding: 0 18px;
-            z-index: 10;
-            gap: 14px;
-            box-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(19,19,20,0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center;
+            padding: 0 16px; z-index: 10; gap: 12px;
+        }
+        @media (min-width: 1024px) {
+            #header { left: var(--sidebar-width); }
         }
 
         #hamburger {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px;
-            transition: var(--transition-fast);
-            z-index: 30;
-            flex-shrink: 0;
-            position: relative;
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: transparent; border: none;
+            border-radius: var(--radius-sm); cursor: pointer;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 5px;
+            padding: 8px; transition: var(--transition);
         }
-        #hamburger:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(100, 180, 220, 0.4);
-            box-shadow: var(--glow-soft);
-        }
+        #hamburger:hover { background: rgba(255,255,255,0.06); }
         #hamburger span {
-            display: block;
-            width: 20px;
-            height: 2px;
-            background: var(--text-primary);
-            border-radius: 2px;
-            transition: var(--transition-smooth);
-            transform-origin: center;
+            display: block; width: 20px; height: 2px;
+            background: var(--text-secondary); border-radius: 2px;
+            transition: var(--transition-slow); transform-origin: center;
         }
-        #hamburger.active span:nth-child(1) {
-            transform: translateY(8px) rotate(45deg);
-        }
-        #hamburger.active span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-        #hamburger.active span:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg);
-        }
+        #hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        #hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         #header-title {
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #5ce0d6, #4da8da, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
+            flex: 1;
+            font-family: var(--font-display);
+            font-size: 1.2rem; font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: transparent;
-            text-shadow: none;
-            filter: drop-shadow(0 0 14px rgba(92, 224, 214, 0.5)) drop-shadow(0 0 28px rgba(77, 168, 218, 0.35));
-            white-space: nowrap;
-            animation: titlePulse 4s ease-in-out infinite;
-        }
-        @keyframes titlePulse {
-            0%,
-            100% {
-                filter: drop-shadow(0 0 14px rgba(92, 224, 214, 0.5)) drop-shadow(0 0 28px rgba(77, 168, 218, 0.35));
-            }
-            50% {
-                filter: drop-shadow(0 0 22px rgba(92, 224, 214, 0.75)) drop-shadow(0 0 40px rgba(77, 168, 218, 0.55));
-            }
+            letter-spacing: -0.3px; white-space: nowrap;
         }
 
-        #sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 15;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-smooth);
+        #header-plans-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 16px; border-radius: var(--radius-pill);
+            border: 1px solid rgba(197,138,249,0.35);
+            background: rgba(197,138,249,0.08);
+            color: var(--accent-purple); font-family: var(--font);
+            font-size: 0.84rem; font-weight: 600; cursor: pointer;
+            transition: var(--transition); white-space: nowrap;
         }
-        #sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+        #header-plans-btn:hover {
+            background: rgba(197,138,249,0.15);
+            border-color: rgba(197,138,249,0.6);
+            box-shadow: 0 0 20px rgba(197,138,249,0.25);
         }
-
-        #sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: var(--sidebar-width);
-            max-width: 85vw;
-            background: var(--glass-bg);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border-right: 1px solid var(--glass-border);
-            z-index: 20;
-            transform: translateX(-105%);
-            transition: transform var(--transition-smooth);
-            padding: 80px 20px 30px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: 8px 0 50px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-        }
-        #sidebar.open {
-            transform: translateX(0);
-        }
-        #sidebar .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: var(--transition-fast);
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.95rem;
-            letter-spacing: -0.1px;
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-        }
-        #sidebar .sidebar-item::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(77, 168, 218, 0.08), rgba(92, 224, 214, 0.04));
-            opacity: 0;
-            transition: opacity var(--transition-fast);
-            border-radius: var(--radius-md);
-        }
-        #sidebar .sidebar-item:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(100, 180, 220, 0.3);
-            color: var(--text-primary);
-            box-shadow: var(--glow-soft);
-        }
-        #sidebar .sidebar-item:hover::before {
-            opacity: 1;
-        }
-        #sidebar .sidebar-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        #sidebar .sidebar-icon svg {
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        #sidebar .sidebar-item:nth-child(1) .sidebar-icon {
-            color: #5ce0d6;
-            box-shadow: 0 0 12px rgba(92, 224, 214, 0.3);
-        }
-        #sidebar .sidebar-item:nth-child(2) .sidebar-icon {
-            color: #4da8da;
-            box-shadow: 0 0 12px rgba(77, 168, 218, 0.3);
-        }
-        #sidebar .sidebar-item:nth-child(3) .sidebar-icon {
-            color: #c084fc;
-            box-shadow: 0 0 12px rgba(192, 132, 252, 0.3);
-        }
-        #sidebar .sidebar-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.08);
-            margin: 8px 0;
-            border: none;
-        }
-        #sidebar .sidebar-social {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: var(--transition-fast);
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-decoration: none;
-            border: 1px solid transparent;
-            letter-spacing: -0.1px;
-        }
-        #sidebar .sidebar-social:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(100, 180, 220, 0.3);
-            color: var(--text-primary);
-            box-shadow: var(--glow-soft);
-        }
-        #sidebar .sidebar-social.whatsapp:hover {
-            border-color: rgba(37, 211, 102, 0.5);
-            box-shadow: 0 0 18px rgba(37, 211, 102, 0.25);
-            color: #25d366;
-        }
-        #sidebar .sidebar-social.instagram:hover {
-            border-color: rgba(225, 48, 108, 0.5);
-            box-shadow: 0 0 18px rgba(225, 48, 108, 0.25);
-            color: #e1306c;
-        }
-        #sidebar .sidebar-social svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: var(--transition-fast);
-        }
-        #sidebar .sidebar-social.whatsapp svg {
-            fill: none;
-        }
-        #sidebar .sidebar-social.instagram svg {
-            fill: none;
+        #header-plans-btn svg {
+            width: 15px; height: 15px; stroke: currentColor;
+            fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
 
+        .header-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--gradient-main);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; font-weight: 700; color: #13131A;
+            cursor: pointer; flex-shrink: 0; transition: var(--transition);
+        }
+        .header-avatar:hover { transform: scale(1.06); box-shadow: 0 0 16px rgba(197,138,249,0.4); }
+
+        @media (max-width: 480px) {
+            #header-plans-btn .btn-text { display: none; }
+            #header-plans-btn { padding: 8px 10px; }
+        }
+
+        /* ─── CHAT CONTAINER ─── */
         #chat-container {
             position: fixed;
-            top: var(--header-height);
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            max-width: 880px;
-            margin: 0 auto;
-            width: 100%;
+            top: var(--header-height); left: 0; right: 0; bottom: 0;
+            z-index: 2; display: flex; flex-direction: column;
+            max-width: 900px; margin: 0 auto;
         }
 
         #messages-area {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 20px 16px 10px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 24px 20px 140px;
+            display: flex; flex-direction: column; gap: 8px;
+            scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
         }
-        #messages-area::-webkit-scrollbar {
-            width: 5px;
-        }
-        #messages-area::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #messages-area::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-        }
-        #messages-area::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.22);
-        }
+        #messages-area::-webkit-scrollbar { width: 4px; }
+        #messages-area::-webkit-scrollbar-track { background: transparent; }
+        #messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
+        /* ─── MESSAGES ─── */
         .message-wrapper {
-            display: flex;
-            gap: 10px;
-            animation: msgFadeIn 0.4s ease-out;
-            align-items: flex-start;
-            max-width: 100%;
+            display: flex; gap: 12px; align-items: flex-start;
+            animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        @keyframes msgFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .message-wrapper.user {
-            flex-direction: row-reverse;
-        }
+        .message-wrapper.user { flex-direction: row-reverse; }
+
         .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-            letter-spacing: -0.2px;
-            border: 2px solid transparent;
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem; flex-shrink: 0;
+            letter-spacing: 0.3px;
         }
         .message-wrapper.ai .message-avatar {
-            background: linear-gradient(135deg, #1a3a4a, #0f2835);
-            border-color: rgba(92, 224, 214, 0.5);
-            color: #5ce0d6;
-            box-shadow: 0 0 16px rgba(92, 224, 214, 0.3);
+            background: var(--gradient-main); color: #13131A;
         }
         .message-wrapper.user .message-avatar {
-            background: linear-gradient(135deg, #2a3040, #1c2233);
-            border-color: rgba(180, 190, 210, 0.4);
-            color: #c0c8d4;
-        }
-        .message-bubble {
-            max-width: 75%;
-            padding: 13px 17px;
-            border-radius: var(--radius-lg);
-            font-size: 0.93rem;
-            line-height: 1.55;
-            letter-spacing: -0.1px;
-            word-break: break-word;
-            position: relative;
-        }
-        .message-wrapper.ai .message-bubble {
-            background: var(--bg-card);
-            border: 1px solid rgba(100, 180, 220, 0.2);
-            border-top-left-radius: 6px;
-            color: var(--text-primary);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        .message-wrapper.user .message-bubble {
-            background: linear-gradient(135deg, #1e3a50, #162d40);
-            border: 1px solid rgba(77, 168, 218, 0.35);
-            border-top-right-radius: 6px;
-            color: #e0ecf5;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+            background: #3C4043; color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
+        .message-bubble {
+            max-width: 78%; padding: 14px 18px;
+            border-radius: var(--radius-lg);
+            font-size: 0.93rem; line-height: 1.6;
+            word-break: break-word; position: relative;
+            letter-spacing: -0.05px;
+        }
+        .message-wrapper.ai .message-bubble {
+            background: var(--bg-bot-msg);
+            border: 1px solid var(--border-subtle);
+            border-top-left-radius: 4px;
+            color: var(--text-primary);
+            padding-bottom: 40px;
+        }
+        .message-wrapper.user .message-bubble {
+            background: var(--bg-user-msg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top-right-radius: 4px;
+            color: var(--text-primary);
+        }
+
+        /* Markdown inside bubbles */
+        .message-bubble strong { color: #C9D1E6; font-weight: 700; }
+        .message-bubble em { color: var(--accent-blue); font-style: italic; }
+        .message-bubble p { margin-bottom: 6px; }
+        .message-bubble p:last-of-type { margin-bottom: 0; }
+        .message-bubble ul, .message-bubble ol { margin: 6px 0 6px 20px; }
+        .message-bubble li { margin-bottom: 3px; }
+        .message-bubble h2 { font-size: 1.05rem; color: var(--accent-blue); margin: 10px 0 5px; font-weight: 700; }
+        .message-bubble h3 { font-size: 0.97rem; color: var(--accent-blue); margin: 8px 0 4px; font-weight: 600; }
+        .message-bubble code {
+            background: var(--bg-elevated); padding: 2px 6px;
+            border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.85em;
+            color: var(--accent-teal);
+        }
+        .message-bubble pre {
+            background: var(--bg-elevated); padding: 14px 16px;
+            border-radius: var(--radius-sm); margin: 8px 0;
+            overflow-x: auto; border: 1px solid var(--border-subtle);
+        }
+        .message-bubble pre code { background: none; padding: 0; font-size: 0.84rem; }
+
+        /* ─── MESSAGE ACTIONS ─── */
+        .message-actions {
+            position: absolute; bottom: 6px; left: 14px;
+            display: flex; gap: 4px;
+            opacity: 0; transition: opacity var(--transition);
+        }
+        .message-wrapper.ai .message-bubble:hover .message-actions { opacity: 1; }
+        .message-action-btn {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(30,31,32,0.9);
+            color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition); backdrop-filter: blur(8px);
+        }
+        .message-action-btn:hover {
+            border-color: rgba(138,180,248,0.5);
+            color: var(--accent-blue);
+            background: rgba(138,180,248,0.1);
+        }
+        .message-action-btn.liked { color: var(--accent-blue); border-color: rgba(138,180,248,0.5); }
+        .message-action-btn.disliked { color: #F28B82; border-color: rgba(242,139,130,0.5); }
+        .message-action-btn.copied { color: #81C995; border-color: rgba(129,201,149,0.5); }
+        .message-action-btn svg {
+            width: 13px; height: 13px;
+            stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+        @media (hover: none), (max-width: 640px) {
+            .message-actions { opacity: 1; }
+        }
+
+        /* ─── TYPING INDICATOR ─── */
         #typing-indicator {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
+            display: none; align-items: center; gap: 12px;
         }
         #typing-indicator.active {
             display: flex;
-            animation: msgFadeIn 0.3s ease-out;
+            animation: msgIn 0.3s ease-out;
         }
-        #typing-indicator .typing-dots {
-            display: flex;
-            gap: 5px;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(100, 180, 220, 0.15);
-            border-top-left-radius: 6px;
+        .typing-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--gradient-main);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #13131A; flex-shrink: 0;
         }
-        #typing-indicator .typing-dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
-            animation: dotBounce 1.4s ease-in-out infinite;
-            display: block;
+        .typing-dots {
+            padding: 14px 20px; background: var(--bg-bot-msg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); border-top-left-radius: 4px;
+            display: flex; gap: 6px; align-items: center;
         }
-        #typing-indicator .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
+        .typing-dots span {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--text-muted);
+            animation: dotPulse 1.4s ease-in-out infinite;
         }
-        #typing-indicator .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes dotBounce {
-            0%,
-            80%,
-            100% {
-                transform: scale(0.6);
-                opacity: 0.35;
-            }
-            40% {
-                transform: scale(1.3);
-                opacity: 1;
-            }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotPulse {
+            0%,80%,100% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1.2); opacity: 1; background: var(--accent-blue); }
         }
 
+        /* ─── INPUT AREA ─── */
         #input-area {
-            padding: 12px 16px 16px 16px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: linear-gradient(to top, rgba(10, 14, 22, 0.95) 60%, rgba(10, 14, 22, 0) 100%);
-            flex-shrink: 0;
-            z-index: 2;
-            position: relative;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 12px 20px 18px;
+            background: linear-gradient(to top, var(--bg-base) 65%, transparent 100%);
+            z-index: 5;
+            max-width: 900px; margin: 0 auto;
         }
-        #input-area .input-wrapper {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
+
+        .input-pill {
+            display: flex; align-items: flex-end; gap: 6px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 10px 12px 10px 14px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
-        #input-area input {
-            width: 100%;
-            padding: 13px 48px 13px 18px;
-            border-radius: 30px;
-            border: 1px solid rgba(100, 180, 220, 0.25);
-            background: var(--bg-panel);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            font-family: var(--font-sans);
-            outline: none;
-            transition: var(--transition-fast);
-            letter-spacing: -0.1px;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        .input-pill:focus-within {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 1px rgba(138,180,248,0.2), 0 4px 24px rgba(0,0,0,0.5);
         }
-        #input-area input:focus {
-            border-color: rgba(92, 224, 214, 0.55);
-            box-shadow: 0 0 22px rgba(92, 224, 214, 0.2), inset 0 2px 8px rgba(0, 0, 0, 0.3);
-            background: #141c2b;
+
+        .input-left-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition); flex-shrink: 0; align-self: flex-end;
         }
-        #input-area input::placeholder {
-            color: var(--text-muted);
-            transition: color 0.3s;
+        .input-left-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+        .input-left-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
+
+        #chat-input {
+            flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text-primary); font-family: var(--font);
+            font-size: 0.95rem; line-height: 1.45; resize: none;
+            min-height: 24px; max-height: 200px; overflow-y: hidden;
+            padding: 5px 0; caret-color: var(--accent-blue);
+            letter-spacing: -0.05px;
+        }
+        #chat-input::placeholder { color: var(--text-muted); }
+        #chat-input::-webkit-scrollbar { display: none; }
+
+        .input-right-btns {
+            display: flex; align-items: center; gap: 4px; flex-shrink: 0; align-self: flex-end;
+        }
+
         #mic-btn {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-fast);
-            flex-shrink: 0;
-            z-index: 3;
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition); flex-shrink: 0;
         }
-        #mic-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(92, 224, 214, 0.4);
-            color: #5ce0d6;
-            box-shadow: 0 0 14px rgba(92, 224, 214, 0.25);
-        }
+        #mic-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
         #mic-btn.listening {
-            background: rgba(220, 50, 50, 0.15);
-            border-color: rgba(255, 80, 80, 0.6);
-            color: #ff5555;
+            background: rgba(242,139,130,0.12);
+            border-color: rgba(242,139,130,0.5);
+            color: #F28B82;
             animation: micPulse 1.2s ease-in-out infinite;
-            box-shadow: 0 0 22px rgba(255, 60, 60, 0.4);
         }
         @keyframes micPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 12px rgba(255, 60, 60, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 28px rgba(255, 60, 60, 0.65);
-            }
+            0%,100% { box-shadow: 0 0 0 0 rgba(242,139,130,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(242,139,130,0); }
         }
         #mic-btn svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        #send-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid rgba(92, 224, 214, 0.35);
-            background: linear-gradient(135deg, #1a3a4a, #0f2835);
-            color: #5ce0d6;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-fast);
-            flex-shrink: 0;
-            font-size: 1.1rem;
-            box-shadow: 0 0 18px rgba(92, 224, 214, 0.2);
-        }
-        #send-btn:hover {
-            background: linear-gradient(135deg, #1f4558, #123040);
-            border-color: rgba(92, 224, 214, 0.6);
-            box-shadow: 0 0 30px rgba(92, 224, 214, 0.4);
-            transform: scale(1.04);
-        }
-        #send-btn:active {
-            transform: scale(0.94);
-            transition: transform 0.1s;
-        }
-        #send-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            width: 16px; height: 16px; stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
 
+        #send-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: none; cursor: pointer;
+            background: var(--gradient-main); color: #13131A;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition); flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(138,180,248,0.25);
+        }
+        #send-btn:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(197,138,249,0.4); }
+        #send-btn:active { transform: scale(0.95); }
+        #send-btn:disabled { opacity: 0.4; transform: none; cursor: default; }
+        #send-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none;
+            stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .input-footer {
+            text-align: center; margin-top: 8px;
+            font-size: 0.72rem; color: var(--text-muted);
+        }
+
+        /* ─── MODALS ─── */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 30;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-smooth);
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 50; display: flex;
+            align-items: center; justify-content: center;
             padding: 20px;
+            opacity: 0; pointer-events: none;
+            transition: opacity var(--transition-slow);
+            backdrop-filter: blur(4px);
         }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
         .modal {
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-xl);
-            padding: 28px 26px;
-            max-width: 560px;
-            width: 100%;
-            max-height: 85dvh;
-            overflow-y: auto;
-            box-shadow: var(--glass-shadow), var(--glow-soft);
+            padding: 28px 24px;
+            max-width: 560px; width: 100%;
+            max-height: 88dvh; overflow-y: auto;
+            box-shadow: var(--shadow-lg);
             position: relative;
-            transform: scale(0.9);
-            transition: transform var(--transition-smooth);
+            transform: scale(0.92) translateY(12px);
+            transition: transform var(--transition-slow);
             color: var(--text-primary);
         }
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+
+        .modal::-webkit-scrollbar { width: 4px; }
+        .modal::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+
         .modal-close {
-            position: absolute;
-            top: 14px;
-            right: 16px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-fast);
-            z-index: 5;
+            position: absolute; top: 14px; right: 14px;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-secondary); cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
         }
-        .modal-close:hover {
-            background: rgba(255, 70, 70, 0.2);
-            border-color: rgba(255, 100, 100, 0.5);
-            color: #ff6b6b;
-        }
+        .modal-close:hover { background: rgba(242,139,130,0.15); border-color: rgba(242,139,130,0.4); color: #F28B82; }
+
         .modal h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: -0.2px;
-            background: linear-gradient(135deg, #5ce0d6, #4da8da);
-            -webkit-background-clip: text;
-            background-clip: text;
+            font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;
+            margin-bottom: 18px; text-align: center; letter-spacing: -0.2px;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: transparent;
-            filter: drop-shadow(0 0 8px rgba(92, 224, 214, 0.4));
-            text-align: center;
         }
-        .modal h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            letter-spacing: -0.1px;
-        }
-        .help-topics {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
+
+        /* Help modal */
+        .help-topics { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 4px; }
         .help-tag {
-            padding: 9px 16px;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(100, 180, 220, 0.25);
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: var(--transition-fast);
-            cursor: default;
-            letter-spacing: -0.1px;
+            padding: 8px 16px; border-radius: var(--radius-pill);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary); font-size: 0.84rem; font-weight: 500;
+            transition: var(--transition); cursor: default;
         }
         .help-tag:hover {
-            background: rgba(92, 224, 214, 0.1);
-            border-color: rgba(92, 224, 214, 0.5);
-            color: #5ce0d6;
-            box-shadow: 0 0 16px rgba(92, 224, 214, 0.2);
+            background: rgba(138,180,248,0.1);
+            border-color: rgba(138,180,248,0.4); color: var(--accent-blue);
         }
 
-        .calculator-container {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+        /* Calculator modal */
+        .modal-calc { max-width: 400px !important; }
         .clock-display {
-            text-align: center;
-            font-family: var(--font-mono);
-            font-size: 2rem;
-            font-weight: 700;
-            color: #5ce0d6;
-            letter-spacing: 4px;
-            text-shadow: 0 0 20px rgba(92, 224, 214, 0.6), 0 0 40px rgba(92, 224, 214, 0.3);
-            padding: 8px 0;
+            text-align: center; font-family: 'Consolas', monospace;
+            font-size: 1.9rem; font-weight: 700; letter-spacing: 4px;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 4px 0 12px;
         }
         .calc-display {
-            background: #0a0f18;
-            border: 1px solid rgba(100, 180, 220, 0.3);
-            border-radius: var(--radius-md);
-            padding: 16px 18px;
-            text-align: right;
-            font-family: var(--font-mono);
-            font-size: 1.6rem;
-            color: #e0f0e8;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            word-break: break-all;
-            letter-spacing: 1px;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-            overflow-x: auto;
-            white-space: nowrap;
+            background: #0C0D0F; border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md); padding: 14px 18px;
+            text-align: right; font-family: 'Consolas', monospace;
+            font-size: 1.6rem; color: var(--text-primary);
+            min-height: 56px; display: flex; align-items: center;
+            justify-content: flex-end; word-break: break-all;
+            overflow-x: auto; white-space: nowrap; margin-bottom: 12px;
         }
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
+        .calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
         .calc-btn {
-            padding: 14px 8px;
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-family: var(--font-sans);
-            letter-spacing: -0.1px;
-            user-select: none;
+            padding: 15px 8px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-elevated); color: var(--text-primary);
+            font-size: 0.98rem; font-weight: 600; cursor: pointer;
+            transition: var(--transition); font-family: var(--font);
             -webkit-tap-highlight-color: transparent;
         }
-        .calc-btn:hover {
-            background: #1e2a3c;
-            border-color: rgba(100, 180, 220, 0.4);
-            box-shadow: 0 0 12px rgba(77, 168, 218, 0.2);
-        }
-        .calc-btn:active {
-            transform: scale(0.94);
-            transition: transform 0.08s;
-            background: #253548;
-        }
-        .calc-btn.operator {
-            background: #162535;
-            border-color: rgba(92, 224, 214, 0.3);
-            color: #5ce0d6;
-            font-weight: 700;
-        }
-        .calc-btn.operator:hover {
-            background: #1c3042;
-            box-shadow: 0 0 16px rgba(92, 224, 214, 0.3);
-        }
+        .calc-btn:hover { background: #333537; border-color: rgba(138,180,248,0.3); }
+        .calc-btn:active { transform: scale(0.93); }
+        .calc-btn.operator { color: var(--accent-blue); background: rgba(138,180,248,0.07); }
+        .calc-btn.operator:hover { background: rgba(138,180,248,0.14); }
         .calc-btn.equals {
-            background: linear-gradient(135deg, #1a4a5a, #0f3038);
-            border-color: rgba(92, 224, 214, 0.5);
-            color: #fff;
-            font-weight: 700;
-            box-shadow: 0 0 18px rgba(92, 224, 214, 0.3);
+            background: var(--gradient-main); color: #13131A; border: none; font-weight: 700;
         }
-        .calc-btn.equals:hover {
-            box-shadow: 0 0 28px rgba(92, 224, 214, 0.5);
-            background: linear-gradient(135deg, #1f5668, #133a44);
-        }
-        .calc-btn.clear {
-            background: #2a1a1a;
-            border-color: rgba(255, 100, 100, 0.3);
-            color: #ff6b6b;
-        }
-        .calc-btn.clear:hover {
-            background: #3a2020;
-            box-shadow: 0 0 14px rgba(255, 100, 100, 0.3);
-        }
-        .calc-btn.zero {
-            grid-column: span 2;
-        }
+        .calc-btn.equals:hover { box-shadow: 0 0 20px rgba(197,138,249,0.4); }
+        .calc-btn.clear { color: #F28B82; background: rgba(242,139,130,0.07); }
+        .calc-btn.clear:hover { background: rgba(242,139,130,0.14); }
+        .calc-btn.zero { grid-column: span 2; }
 
-        .plans-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        @media (max-width: 520px) {
-            .plans-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* Plans modal */
+        .modal-plans { max-width: 620px !important; }
+        .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 520px) { .plans-grid { grid-template-columns: 1fr; } }
         .plan-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-lg);
-            padding: 22px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: var(--transition-fast);
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg); padding: 22px 18px;
+            display: flex; flex-direction: column; gap: 12px;
+            transition: var(--transition); position: relative; overflow: hidden;
         }
         .plan-card.featured {
-            border-color: rgba(92, 224, 214, 0.5);
-            box-shadow: 0 0 25px rgba(92, 224, 214, 0.2);
-            background: #111d28;
+            border-color: rgba(138,180,248,0.4);
+            box-shadow: 0 0 30px rgba(138,180,248,0.12);
+            background: #1A2030;
         }
         .plan-card.featured::after {
-            content: 'Recomendado';
-            position: absolute;
-            top: 12px;
-            right: -32px;
-            background: linear-gradient(135deg, #5ce0d6, #4da8da);
-            color: #000;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 38px;
-            transform: rotate(45deg);
-            letter-spacing: 0.5px;
+            content: 'Recomendado'; position: absolute;
+            top: 12px; right: -32px;
+            background: var(--gradient-main); color: #13131A;
+            font-size: 0.68rem; font-weight: 700;
+            padding: 4px 38px; transform: rotate(45deg); letter-spacing: 0.5px;
         }
-        .plan-card:hover {
-            border-color: rgba(100, 180, 220, 0.4);
-            box-shadow: var(--glow-soft);
-            transform: translateY(-2px);
-        }
-        .plan-card.featured:hover {
-            box-shadow: 0 0 35px rgba(92, 224, 214, 0.35);
-        }
-        .plan-price {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
-        }
-        .plan-price span {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
-        .plan-benefits {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            flex: 1;
-        }
-        .plan-benefits li {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: -0.1px;
-        }
-        .plan-benefits li::before {
-            content: '✓';
-            color: #5ce0d6;
-            font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-        .plan-benefits li.missing::before {
-            content: '—';
-            color: var(--text-muted);
-        }
-        .payment-btns {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .plan-card:hover { transform: translateY(-2px); border-color: rgba(138,180,248,0.3); }
+        .plan-card h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .plan-price { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .plan-price span { font-size: 0.88rem; font-weight: 400; color: var(--text-muted); }
+        .plan-benefits { list-style: none; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+        .plan-benefits li { font-size: 0.84rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .plan-benefits li::before { content: '✓'; color: var(--accent-blue); font-weight: 700; flex-shrink: 0; }
+        .plan-benefits li.missing::before { content: '—'; color: var(--text-muted); }
+        .payment-btns { display: flex; gap: 8px; flex-wrap: wrap; }
         .payment-btn {
-            flex: 1;
-            min-width: 100px;
-            padding: 12px 14px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: var(--bg-panel);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: var(--transition-fast);
-            letter-spacing: -0.1px;
-            font-family: var(--font-sans);
+            flex: 1; min-width: 90px; padding: 11px 14px; border-radius: var(--radius-pill);
+            border: 1px solid var(--border-subtle); background: var(--bg-surface);
+            color: var(--text-primary); cursor: pointer; font-weight: 600;
+            font-size: 0.84rem; display: flex; align-items: center;
+            justify-content: center; gap: 7px; transition: var(--transition); font-family: var(--font);
         }
-        .payment-btn:hover {
-            border-color: rgba(92, 224, 214, 0.5);
-            box-shadow: 0 0 20px rgba(92, 224, 214, 0.25);
-            background: #1a2535;
-        }
-        .payment-btn svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-        .payment-btn.pix svg {
-            fill: none;
-            stroke: #5ce0d6;
-            stroke-width: 1.8;
-        }
-        .payment-btn.card svg {
-            fill: none;
-            stroke: #4da8da;
-            stroke-width: 1.8;
-        }
+        .payment-btn:hover { border-color: rgba(138,180,248,0.5); background: rgba(138,180,248,0.08); color: var(--accent-blue); }
+        .payment-btn:disabled { opacity: 0.4; cursor: default; }
+        .payment-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 640px) {
-            #header-title {
-                font-size: 1.15rem;
-            }
-            #sidebar {
-                width: 78vw;
-                max-width: 78vw;
-            }
-            #messages-area {
-                padding: 14px 10px 8px 10px;
-                gap: 10px;
-            }
-            .message-bubble {
-                max-width: 85%;
-                font-size: 0.88rem;
-                padding: 11px 14px;
-            }
-            .message-avatar {
-                width: 30px;
-                height: 30px;
-                font-size: 0.7rem;
-            }
-            #input-area {
-                padding: 8px 10px 12px 10px;
-                gap: 8px;
-            }
-            #input-area input {
-                padding: 11px 42px 11px 14px;
-                font-size: 0.9rem;
-            }
-            #send-btn {
-                width: 40px;
-                height: 40px;
-            }
-            #mic-btn {
-                width: 30px;
-                height: 30px;
-                right: 4px;
-            }
-            #mic-btn svg {
-                width: 14px;
-                height: 14px;
-            }
-            .modal {
-                padding: 22px 16px;
-                border-radius: var(--radius-lg);
-                max-width: 95vw;
-            }
-            .calc-btn {
-                padding: 12px 6px;
-                font-size: 0.9rem;
-            }
-            .calc-display {
-                font-size: 1.3rem;
-                padding: 12px 14px;
-                min-height: 48px;
-            }
-            .clock-display {
-                font-size: 1.5rem;
-            }
-            .plan-price {
-                font-size: 1.7rem;
-            }
-            #splash-screen .splash-title {
-                font-size: 1.4rem;
-            }
-            #splash-screen .splash-subtitle {
-                font-size: 0.85rem;
-            }
-            #splash-screen .splash-logo {
-                width: 66px;
-                height: 66px;
-            }
+            #messages-area { padding: 16px 12px 130px; }
+            .message-bubble { max-width: 90%; font-size: 0.88rem; padding: 12px 14px; }
+            .message-wrapper.ai .message-bubble { padding-bottom: 38px; }
+            #input-area { padding: 8px 12px 14px; }
+            .modal { padding: 22px 16px; }
+            .calc-btn { padding: 12px 6px; font-size: 0.88rem; }
+            .calc-display { font-size: 1.3rem; }
+            .clock-display { font-size: 1.4rem; }
         }
         @media (max-width: 380px) {
-            #header-title {
-                font-size: 1rem;
-            }
-            #hamburger {
-                width: 34px;
-                height: 34px;
-                padding: 6px;
-            }
-            #hamburger span {
-                width: 17px;
-            }
-            .message-bubble {
-                max-width: 90%;
-                font-size: 0.84rem;
-            }
-            .calc-buttons {
-                gap: 5px;
-            }
-            .calc-btn {
-                padding: 10px 4px;
-                font-size: 0.82rem;
-                border-radius: 8px;
-            }
-            #input-area input {
-                padding: 10px 38px 10px 12px;
-                font-size: 0.82rem;
-            }
+            .message-bubble { max-width: 94%; font-size: 0.84rem; }
+            #header-title { font-size: 1rem; }
+        }
+
+        /* ─── WELCOME SCREEN (shown when no messages) ─── */
+        #welcome-screen {
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 12px; text-align: center;
+            padding: 40px 24px; flex: 1;
+        }
+        #welcome-screen.show { display: flex; }
+        .welcome-gem { width: 60px; height: 60px; animation: gemFloat 3s ease-in-out infinite; }
+        .welcome-title {
+            font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; letter-spacing: -0.4px;
+        }
+        .welcome-sub { color: var(--text-secondary); font-size: 0.93rem; max-width: 340px; line-height: 1.5; }
+        .welcome-chips {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            justify-content: center; margin-top: 8px; max-width: 520px;
+        }
+        .welcome-chip {
+            padding: 9px 16px; border-radius: var(--radius-pill);
+            background: var(--bg-surface); border: 1px solid var(--border-subtle);
+            color: var(--text-secondary); font-size: 0.84rem; cursor: pointer;
+            transition: var(--transition); font-family: var(--font);
+        }
+        .welcome-chip:hover {
+            background: rgba(138,180,248,0.1);
+            border-color: rgba(138,180,248,0.4); color: var(--accent-blue);
         }
     </style>
 </head>
 <body>
-    <div id="bg-image"></div>
-    <canvas id="particles-canvas"></canvas>
 
-    <div id="splash-screen">
-        <svg class="splash-logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="splashGrad" x1="10" y1="10" x2="70" y2="70" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#5ce0d6"/>
-                    <stop offset="0.5" stop-color="#4da8da"/>
-                    <stop offset="1" stop-color="#818cf8"/>
-                </linearGradient>
-                <filter id="splashGlow" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
-                    <feFlood flood-color="#5ce0d6" flood-opacity="0.6"/>
-                    <feComposite in2="blur" operator="in"/>
-                    <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-            </defs>
-            <circle cx="40" cy="40" r="34" stroke="url(#splashGrad)" stroke-width="3" fill="none" filter="url(#splashGlow)"/>
-            <path d="M26 44 L34 30 L40 38 L48 22 L54 44" stroke="url(#splashGrad)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#splashGlow)"/>
-            <circle cx="48" cy="22" r="3" fill="#5ce0d6" filter="url(#splashGlow)"/>
+<!-- SPLASH SCREEN -->
+<div id="splash-screen">
+    <svg class="splash-gem" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="g1" x1="10" y1="10" x2="70" y2="70">
+                <stop stop-color="#8AB4F8"/>
+                <stop offset="0.5" stop-color="#C58AF9"/>
+                <stop offset="1" stop-color="#8AB4F8"/>
+            </linearGradient>
+            <filter id="gf"><feGaussianBlur in="SourceAlpha" stdDeviation="3" result="b"/>
+            <feFlood flood-color="#8AB4F8" flood-opacity="0.5"/><feComposite in2="b" operator="in"/>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <circle cx="40" cy="40" r="32" stroke="url(#g1)" stroke-width="2.5" fill="none" filter="url(#gf)"/>
+        <path d="M26 44 L34 30 L40 38 L48 22 L54 44" stroke="url(#g1)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#gf)"/>
+        <circle cx="48" cy="22" r="3.5" fill="#8AB4F8" filter="url(#gf)"/>
+    </svg>
+    <div class="splash-title">Edy Marques.ai</div>
+    <div class="splash-sub">Sua inteligência artificial especializada em concursos e estudos</div>
+    <button class="splash-btn ripple-host" id="splash-start-btn">Começar agora</button>
+    <button class="splash-google-btn ripple-host" id="splash-google-btn">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continuar com Google
+    </button>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar-overlay"></div>
+<aside id="sidebar">
+    <div class="sidebar-header">
+        <svg class="sidebar-logo-mark" viewBox="0 0 32 32" fill="none">
+            <defs><linearGradient id="sg" x1="4" y1="4" x2="28" y2="28"><stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#C58AF9"/></linearGradient></defs>
+            <circle cx="16" cy="16" r="13" stroke="url(#sg)" stroke-width="2" fill="none"/>
+            <path d="M10 18 L14 12 L16 15 L20 9 L22 18" stroke="url(#sg)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="9" r="1.8" fill="#8AB4F8"/>
         </svg>
-        <div class="splash-title">Bem-vindo ao Edy Marques.ai</div>
-        <div class="splash-subtitle">Sua ferramenta inteligente para estudos e concursos</div>
-        <button class="splash-btn" id="splash-start-btn">Começar</button>
-        <button class="splash-google-btn" id="splash-google-btn">
-            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Continuar com Google
-        </button>
+        <span class="sidebar-brand">Edy Marques.ai</span>
     </div>
 
-    <header id="header">
-        <button id="hamburger" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <span id="header-title">Edy Marques.ai</span>
-    </header>
+    <button class="sidebar-new-chat ripple-host" id="sidebar-new-chat-btn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nova conversa
+    </button>
 
-    <div id="sidebar-overlay"></div>
-    <aside id="sidebar">
-        <div class="sidebar-item" data-action="help">
-            <div class="sidebar-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
-            </div>
-            <span>Como posso ajudar?</span>
-        </div>
-        <div class="sidebar-item" data-action="calculator">
-            <div class="sidebar-icon">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="12" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="14" y1="16" x2="16" y2="16"/></svg>
-            </div>
-            <span>Calculadora</span>
-        </div>
-        <div class="sidebar-item" data-action="plans">
-            <div class="sidebar-icon">
-                <svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/></svg>
-            </div>
-            <span>Assinar Plus</span>
-        </div>
-        <hr class="sidebar-divider">
-        <a class="sidebar-social whatsapp" href="https://wa.me/559584093346" target="_blank" rel="noopener">
+    <div class="sidebar-section-label">Recentes</div>
+
+    <div class="sidebar-chat-item" data-action="chat-history">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Como estudar para o ENEM</span>
+    </div>
+    <div class="sidebar-chat-item" data-action="chat-history">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Resumo de História do Brasil</span>
+    </div>
+    <div class="sidebar-chat-item" data-action="chat-history">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Matemática – Raciocínio Lógico</span>
+    </div>
+    <div class="sidebar-chat-item" data-action="calculator">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="12" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/><line x1="14" y1="16" x2="16" y2="16"/></svg>
+        <span>Calculadora</span>
+    </div>
+    <div class="sidebar-chat-item" data-action="help">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
+        <span>Como posso ajudar?</span>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <button class="sidebar-plus-btn ripple-host" id="sidebar-plans-btn">
+        <svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/></svg>
+        Assinar Plus — R$9,99/mês
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-footer">
+        <a class="sidebar-footer-item whatsapp" href="https://wa.me/559584093346" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
             WhatsApp
         </a>
-        <a class="sidebar-social instagram" href="https://www.instagram.com/invites/contact/?igsh=eb9eekdyfshm&utm_content=obfd9yt" target="_blank" rel="noopener">
+        <a class="sidebar-footer-item instagram" href="https://www.instagram.com/invites/contact/?igsh=eb9eekdyfshm&utm_content=obfd9yt" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/></svg>
             Instagram
         </a>
-    </aside>
+        <div class="sidebar-footer-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="1" fill="currentColor" stroke="none"/></svg>
+            Ajuda & Suporte
+        </div>
+        <div class="sidebar-footer-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Configurações
+        </div>
+    </div>
+</aside>
 
-    <div id="chat-container">
-        <div id="messages-area"></div>
-        <div id="typing-indicator">
-            <div class="message-avatar" style="background:linear-gradient(135deg,#1a3a4a,#0f2835);border:2px solid rgba(92,224,214,0.5);color:#5ce0d6;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;box-shadow:0 0 16px rgba(92,224,214,0.3);">EM</div>
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
+<!-- HEADER -->
+<header id="header">
+    <button id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+    <span id="header-title">Edy Marques.ai</span>
+    <button id="header-plans-btn" aria-label="Assinar Plus" class="ripple-host">
+        <svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/></svg>
+        <span class="btn-text">Assinar Plus</span>
+    </button>
+    <div class="header-avatar" aria-label="Usuário">U</div>
+</header>
+
+<!-- CHAT CONTAINER -->
+<div id="chat-container">
+    <div id="messages-area">
+        <!-- Welcome screen shown before first message -->
+        <div id="welcome-screen">
+            <svg class="welcome-gem" viewBox="0 0 60 60" fill="none">
+                <defs><linearGradient id="wg" x1="8" y1="8" x2="52" y2="52"><stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#C58AF9"/></linearGradient></defs>
+                <circle cx="30" cy="30" r="24" stroke="url(#wg)" stroke-width="2" fill="none"/>
+                <path d="M19 33 L25 22 L30 29 L36 16 L41 33" stroke="url(#wg)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="36" cy="16" r="2.5" fill="#8AB4F8"/>
+            </svg>
+            <div class="welcome-title">Olá, como posso ajudar?</div>
+            <div class="welcome-sub">Sou especializado em estudos para concursos públicos, ENEM e produtividade.</div>
+            <div class="welcome-chips">
+                <button class="welcome-chip ripple-host" data-prompt="Me explique como organizar um plano de estudos para concurso">📅 Plano de estudos</button>
+                <button class="welcome-chip ripple-host" data-prompt="Faça um resumo sobre Direito Constitucional para concursos">⚖️ Direito Constitucional</button>
+                <button class="welcome-chip ripple-host" data-prompt="Quais são as dicas para a redação do ENEM?">✍️ Redação ENEM</button>
+                <button class="welcome-chip ripple-host" data-prompt="Me dê 10 questões de raciocínio lógico para treinar">🧠 Raciocínio Lógico</button>
+                <button class="welcome-chip ripple-host" data-prompt="Crie um simulado de História do Brasil com 5 questões">📚 Simulado História</button>
             </div>
         </div>
-        <div id="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="chat-input" placeholder="Digite sua pergunta..." maxlength="2000" autocomplete="off">
-                <button id="mic-btn" aria-label="Microfone" title="Clique para falar">
-                    <svg viewBox="0 0 24 24"><rect x="8" y="1" width="8" height="13" rx="4"/><line x1="12" y1="17" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/><path d="M4 10a8 8 0 0016 0"/></svg>
-                </button>
-            </div>
+    </div>
+    <div id="typing-indicator">
+        <div class="typing-avatar">EM</div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+</div>
+
+<!-- INPUT AREA -->
+<div id="input-area">
+    <div class="input-pill">
+        <button class="input-left-btn ripple-host" aria-label="Anexar" title="Anexar arquivo">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <textarea id="chat-input" placeholder="Faça sua pergunta sobre o concurso..." maxlength="2000" autocomplete="off" rows="1"></textarea>
+        <div class="input-right-btns">
+            <button id="mic-btn" aria-label="Microfone" title="Clique para falar">
+                <svg viewBox="0 0 24 24"><rect x="8" y="1" width="8" height="13" rx="4"/><line x1="12" y1="17" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/><path d="M4 10a8 8 0 0016 0"/></svg>
+            </button>
             <button id="send-btn" aria-label="Enviar">
                 <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
             </button>
         </div>
     </div>
+    <div class="input-footer">Edy Marques.ai pode cometer erros. Verifique informações importantes.</div>
+</div>
 
-    <div class="modal-overlay" id="modal-help-overlay">
-        <div class="modal" id="modal-help">
-            <button class="modal-close" data-close="help">✕</button>
-            <h2>Como posso ajudar?</h2>
-            <p style="text-align:center;color:var(--text-secondary);margin-bottom:16px;font-size:0.9rem;">Sou especializado em auxiliar você nas seguintes áreas:</p>
-            <div class="help-topics">
-                <span class="help-tag">Estudos</span>
-                <span class="help-tag">Concursos</span>
-                <span class="help-tag">Redação</span>
-                <span class="help-tag">Matemática</span>
-                <span class="help-tag">Biologia</span>
-                <span class="help-tag">História</span>
-                <span class="help-tag">Geografia</span>
-                <span class="help-tag">Produtividade</span>
-                <span class="help-tag">Resumos</span>
-                <span class="help-tag">Simulados</span>
-                <span class="help-tag">Organização de estudos</span>
-            </div>
+<!-- MODAL: AJUDA -->
+<div class="modal-overlay" id="modal-help-overlay">
+    <div class="modal">
+        <button class="modal-close" data-close="help">✕</button>
+        <h2>Como posso ajudar?</h2>
+        <p style="text-align:center;color:var(--text-secondary);margin-bottom:18px;font-size:0.88rem;">Especializado nas seguintes áreas para concursos e estudos:</p>
+        <div class="help-topics">
+            <span class="help-tag">Estudos</span>
+            <span class="help-tag">Concursos Públicos</span>
+            <span class="help-tag">Redação ENEM</span>
+            <span class="help-tag">Matemática</span>
+            <span class="help-tag">Biologia</span>
+            <span class="help-tag">História</span>
+            <span class="help-tag">Geografia</span>
+            <span class="help-tag">Produtividade</span>
+            <span class="help-tag">Resumos</span>
+            <span class="help-tag">Simulados</span>
+            <span class="help-tag">Direito Constitucional</span>
+            <span class="help-tag">Organização de estudos</span>
         </div>
     </div>
+</div>
 
-    <div class="modal-overlay" id="modal-calc-overlay">
-        <div class="modal" id="modal-calc" style="max-width:420px;">
-            <button class="modal-close" data-close="calc">✕</button>
-            <h2>Calculadora</h2>
-            <div class="calculator-container">
-                <div class="clock-display" id="clock-display">00:00:00</div>
-                <div class="calc-display" id="calc-display">0</div>
-                <div class="calc-buttons">
-                    <button class="calc-btn clear" data-action="clear">C</button>
-                    <button class="calc-btn operator" data-action="backspace">⌫</button>
-                    <button class="calc-btn operator" data-action="paren-open">(</button>
-                    <button class="calc-btn operator" data-action="paren-close">)</button>
-                    <button class="calc-btn" data-action="7">7</button>
-                    <button class="calc-btn" data-action="8">8</button>
-                    <button class="calc-btn" data-action="9">9</button>
-                    <button class="calc-btn operator" data-action="÷">÷</button>
-                    <button class="calc-btn" data-action="4">4</button>
-                    <button class="calc-btn" data-action="5">5</button>
-                    <button class="calc-btn" data-action="6">6</button>
-                    <button class="calc-btn operator" data-action="×">×</button>
-                    <button class="calc-btn" data-action="1">1</button>
-                    <button class="calc-btn" data-action="2">2</button>
-                    <button class="calc-btn" data-action="3">3</button>
-                    <button class="calc-btn operator" data-action="-">−</button>
-                    <button class="calc-btn zero" data-action="0">0</button>
-                    <button class="calc-btn" data-action=".">.</button>
-                    <button class="calc-btn operator" data-action="+">+</button>
-                    <button class="calc-btn equals" data-action="=">=</button>
+<!-- MODAL: CALCULADORA -->
+<div class="modal-overlay" id="modal-calc-overlay">
+    <div class="modal modal-calc" style="max-width:400px;">
+        <button class="modal-close" data-close="calc">✕</button>
+        <h2>Calculadora</h2>
+        <div class="clock-display" id="clock-display">00:00:00</div>
+        <div class="calc-display" id="calc-display">0</div>
+        <div class="calc-buttons">
+            <button class="calc-btn clear ripple-host" data-action="clear">C</button>
+            <button class="calc-btn operator ripple-host" data-action="backspace">⌫</button>
+            <button class="calc-btn operator ripple-host" data-action="paren-open">(</button>
+            <button class="calc-btn operator ripple-host" data-action="paren-close">)</button>
+            <button class="calc-btn ripple-host" data-action="7">7</button>
+            <button class="calc-btn ripple-host" data-action="8">8</button>
+            <button class="calc-btn ripple-host" data-action="9">9</button>
+            <button class="calc-btn operator ripple-host" data-action="÷">÷</button>
+            <button class="calc-btn ripple-host" data-action="4">4</button>
+            <button class="calc-btn ripple-host" data-action="5">5</button>
+            <button class="calc-btn ripple-host" data-action="6">6</button>
+            <button class="calc-btn operator ripple-host" data-action="×">×</button>
+            <button class="calc-btn ripple-host" data-action="1">1</button>
+            <button class="calc-btn ripple-host" data-action="2">2</button>
+            <button class="calc-btn ripple-host" data-action="3">3</button>
+            <button class="calc-btn operator ripple-host" data-action="-">−</button>
+            <button class="calc-btn zero ripple-host" data-action="0">0</button>
+            <button class="calc-btn ripple-host" data-action=".">.</button>
+            <button class="calc-btn operator ripple-host" data-action="+">+</button>
+            <button class="calc-btn equals ripple-host" data-action="=">=</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PLANOS -->
+<div class="modal-overlay" id="modal-plans-overlay">
+    <div class="modal modal-plans" style="max-width:620px;">
+        <button class="modal-close" data-close="plans">✕</button>
+        <h2>Escolha seu plano</h2>
+        <div class="plans-grid">
+            <div class="plan-card">
+                <h3>Plano Free</h3>
+                <div class="plan-price">R$0<span>/mês</span></div>
+                <ul class="plan-benefits">
+                    <li>Respostas limitadas</li>
+                    <li>Velocidade normal</li>
+                    <li>Acesso básico</li>
+                    <li>Limite diário</li>
+                    <li class="missing">Respostas mais rápidas</li>
+                    <li class="missing">Prioridade no servidor</li>
+                    <li class="missing">Sem limite diário</li>
+                    <li class="missing">Memória melhor</li>
+                    <li class="missing">Suporte prioritário</li>
+                </ul>
+                <div class="payment-btns">
+                    <button class="payment-btn" disabled>Grátis</button>
+                </div>
+            </div>
+            <div class="plan-card featured">
+                <h3>Plano Plus</h3>
+                <div class="plan-price">R$9,99<span>/mês</span></div>
+                <ul class="plan-benefits">
+                    <li>Respostas mais rápidas</li>
+                    <li>Prioridade no servidor</li>
+                    <li>Respostas mais inteligentes</li>
+                    <li>Sem limite diário</li>
+                    <li>Memória melhor</li>
+                    <li>Experiência premium</li>
+                    <li>Suporte prioritário</li>
+                </ul>
+                <div class="payment-btns">
+                    <button class="payment-btn ripple-host">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#8AB4F8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><rect x="7" y="7" width="10" height="10" rx="1"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+                        PIX
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal-overlay" id="modal-plans-overlay">
-        <div class="modal" id="modal-plans" style="max-width:620px;">
-            <button class="modal-close" data-close="plans">✕</button>
-            <h2>Escolha seu plano</h2>
-            <div class="plans-grid">
-                <div class="plan-card">
-                    <h3>Plano Free</h3>
-                    <div class="plan-price">R$0<span>/mês</span></div>
-                    <ul class="plan-benefits">
-                        <li>Respostas limitadas</li>
-                        <li>Velocidade normal</li>
-                        <li>Acesso básico</li>
-                        <li>Limite diário</li>
-                        <li>IA básica</li>
-                        <li class="missing">Respostas mais rápidas</li>
-                        <li class="missing">Prioridade no servidor</li>
-                        <li class="missing">Sem limite diário</li>
-                        <li class="missing">Memória melhor</li>
-                        <li class="missing">Suporte prioritário</li>
-                    </ul>
-                    <div class="payment-btns">
-                        <button class="payment-btn pix" disabled style="opacity:0.5;cursor:default;">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" fill="none"/><rect x="7" y="7" width="10" height="10" rx="1" stroke="currentColor" fill="none"/><line x1="12" y1="7" x2="12" y2="17" stroke="currentColor"/><line x1="7" y1="12" x2="17" y2="12" stroke="currentColor"/></svg>
-                            Grátis
-                        </button>
-                    </div>
-                </div>
-                <div class="plan-card featured">
-                    <h3>Plano Plus</h3>
-                    <div class="plan-price">R$9,99<span>/mês</span></div>
-                    <ul class="plan-benefits">
-                        <li>Respostas mais rápidas</li>
-                        <li>Prioridade no servidor</li>
-                        <li>Respostas mais inteligentes</li>
-                        <li>Sem limite diário</li>
-                        <li>Memória melhor</li>
-                        <li>Experiência premium</li>
-                        <li>Suporte prioritário</li>
-                    </ul>
-                    <div class="payment-btns">
-                        <button class="payment-btn pix">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" fill="none"/><rect x="7" y="7" width="10" height="10" rx="1" stroke="currentColor" fill="none"/><line x1="12" y1="7" x2="12" y2="17" stroke="currentColor"/><line x1="7" y1="12" x2="17" y2="12" stroke="currentColor"/></svg>
-                            PIX
-                        </button>
-                        <button class="payment-btn card">
-                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" fill="none"/><line x1="2" y1="10" x2="22" y2="10" stroke="currentColor"/><rect x="5" y="14" width="6" height="3" rx="1" fill="currentColor" opacity="0.4"/></svg>
-                            Cartão
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+(function () {
+    /* ============================================================
+       🔄 INTEGRAÇÃO COM BACKEND (RESTAURADA CONFORME ESPECIFICAÇÃO)
+       URL: https://minha-ai-u0zy.onrender.com/api/chat
+       MÉTODO: POST
+       HEADERS: { "Content-Type": "application/json" }
+       BODY: { "message": "...", "history": [...] }
+       RESPOSTA: { "response": "..." }
+       ============================================================ */
+    const API_URL = 'https://minha-ai-u0zy.onrender.com/api/chat';
 
-    <script>
-        (function() {
-            const API_URL = 'https://minha-ai-u0zy.onrender.com/api/chat';
+    /* ─── ELEMENT REFS ─── */
+    const hamburger        = document.getElementById('hamburger');
+    const sidebar          = document.getElementById('sidebar');
+    const sidebarOverlay   = document.getElementById('sidebar-overlay');
+    const chatInput        = document.getElementById('chat-input');
+    const sendBtn          = document.getElementById('send-btn');
+    const messagesArea     = document.getElementById('messages-area');
+    const typingIndicator  = document.getElementById('typing-indicator');
+    const modalHelpOverlay = document.getElementById('modal-help-overlay');
+    const modalCalcOverlay = document.getElementById('modal-calc-overlay');
+    const modalPlansOverlay= document.getElementById('modal-plans-overlay');
+    const calcDisplay      = document.getElementById('calc-display');
+    const clockDisplay     = document.getElementById('clock-display');
+    const micBtn           = document.getElementById('mic-btn');
+    const splashScreen     = document.getElementById('splash-screen');
+    const splashStartBtn   = document.getElementById('splash-start-btn');
+    const splashGoogleBtn  = document.getElementById('splash-google-btn');
+    const headerPlansBtn   = document.getElementById('header-plans-btn');
+    const welcomeScreen    = document.getElementById('welcome-screen');
+    const sidebarNewChatBtn= document.getElementById('sidebar-new-chat-btn');
+    const sidebarPlansBtn  = document.getElementById('sidebar-plans-btn');
 
-            const particlesCanvas = document.getElementById('particles-canvas');
-            const ctx = particlesCanvas.getContext('2d');
-            const hamburger = document.getElementById('hamburger');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebar-overlay');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-            const messagesArea = document.getElementById('messages-area');
-            const typingIndicator = document.getElementById('typing-indicator');
-            const modalHelpOverlay = document.getElementById('modal-help-overlay');
-            const modalCalcOverlay = document.getElementById('modal-calc-overlay');
-            const modalPlansOverlay = document.getElementById('modal-plans-overlay');
-            const calcDisplay = document.getElementById('calc-display');
-            const clockDisplay = document.getElementById('clock-display');
-            const micBtn = document.getElementById('mic-btn');
-            const splashScreen = document.getElementById('splash-screen');
-            const splashStartBtn = document.getElementById('splash-start-btn');
-            const splashGoogleBtn = document.getElementById('splash-google-btn');
+    /* ─── STATE ─── */
+    let sidebarOpen         = false;
+    let calcExpression      = '';
+    let calcResultShown     = false;
+    let isWaitingForResponse= false;
+    let chatHistory         = [];
+    let recognition         = null;
+    let isListening         = false;
+    let hasMessages         = false;
 
-            let sidebarOpen = false;
-            let calcExpression = '';
-            let calcResultShown = false;
-            let isWaitingForResponse = false;
-            let chatHistory = [];
-            let recognition = null;
-            let isListening = false;
+    /* ─── RIPPLE EFFECT ─── */
+    document.addEventListener('click', function(e) {
+        const host = e.target.closest('.ripple-host');
+        if (!host) return;
+        const rect = host.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+        host.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+    });
 
-            const placeholderPhrases = [
-                'Digite sua pergunta...',
-                'Pergunte sobre concursos...',
-                'Tire dúvidas de matemática...',
-                'Peça um resumo rápido...',
-                'Estude para o ENEM...',
-                'Organize seus estudos...',
-                'Pergunte sobre história...',
-                'Solicite um simulado...',
-            ];
-            let placeholderIndex = 0;
-            let placeholderCharIndex = 0;
-            let placeholderDeleting = false;
-            let placeholderPauseCounter = 0;
-            const placeholderTypeSpeed = 55;
-            const placeholderDeleteSpeed = 30;
-            const placeholderPauseFrames = 50;
-
-            function animatePlaceholder() {
-                const currentPhrase = placeholderPhrases[placeholderIndex];
-                if (!placeholderDeleting) {
-                    if (placeholderCharIndex < currentPhrase.length) {
-                        placeholderCharIndex++;
-                        chatInput.placeholder = currentPhrase.substring(0, placeholderCharIndex);
-                    } else {
-                        placeholderPauseCounter++;
-                        if (placeholderPauseCounter >= placeholderPauseFrames) {
-                            placeholderDeleting = true;
-                            placeholderPauseCounter = 0;
-                        }
-                    }
-                } else {
-                    if (placeholderCharIndex > 0) {
-                        placeholderCharIndex--;
-                        chatInput.placeholder = currentPhrase.substring(0, placeholderCharIndex);
-                    } else {
-                        placeholderDeleting = false;
-                        placeholderIndex = (placeholderIndex + 1) % placeholderPhrases.length;
-                        placeholderCharIndex = 0;
-                    }
-                }
-                const speed = placeholderDeleting ? placeholderDeleteSpeed : placeholderTypeSpeed;
-                if (placeholderDeleting && placeholderCharIndex === 0) {
-                    setTimeout(animatePlaceholder, 200);
-                } else if (!placeholderDeleting && placeholderPauseCounter > 0) {
-                    setTimeout(animatePlaceholder, speed);
-                } else {
-                    setTimeout(animatePlaceholder, speed);
-                }
+    /* ─── WELCOME SCREEN ─── */
+    welcomeScreen.classList.add('show');
+    document.querySelectorAll('.welcome-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            const prompt = this.getAttribute('data-prompt');
+            if (prompt) {
+                chatInput.value = prompt;
+                autoResizeTextarea();
+                sendMessage();
             }
-            animatePlaceholder();
+        });
+    });
 
-            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.lang = 'pt-BR';
-                recognition.interimResults = true;
-                recognition.maxAlternatives = 1;
-                recognition.continuous = false;
+    /* ─── PLACEHOLDER ANIMATION ─── */
+    const placeholderPhrases = [
+        'Faça sua pergunta sobre o concurso...',
+        'Pergunte sobre raciocínio lógico...',
+        'Tire dúvidas de direito constitucional...',
+        'Peça um resumo rápido...',
+        'Estude para o ENEM...',
+        'Organize seus estudos...',
+        'Pergunte sobre história do Brasil...',
+        'Solicite um simulado...',
+    ];
+    let phIdx = 0, phChar = 0, phDeleting = false, phPause = 0;
+    function animatePlaceholder() {
+        const cur = placeholderPhrases[phIdx];
+        if (!phDeleting) {
+            if (phChar < cur.length) { phChar++; chatInput.placeholder = cur.slice(0, phChar); }
+            else { phPause++; if (phPause >= 50) { phDeleting = true; phPause = 0; } }
+        } else {
+            if (phChar > 0) { phChar--; chatInput.placeholder = cur.slice(0, phChar); }
+            else { phDeleting = false; phIdx = (phIdx + 1) % placeholderPhrases.length; phChar = 0; }
+        }
+        setTimeout(animatePlaceholder, phDeleting ? 30 : 55);
+    }
+    animatePlaceholder();
 
-                recognition.onresult = function(event) {
-                    let transcript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        transcript += event.results[i][0].transcript;
-                    }
-                    chatInput.value = transcript;
-                    chatInput.focus();
-                };
-                recognition.onerror = function(event) {
-                    stopListening();
-                    if (event.error === 'not-allowed') {
-                        chatInput.placeholder = 'Permissão de microfone negada...';
-                        setTimeout(() => { chatInput.placeholder = placeholderPhrases[placeholderIndex]
-                                .substring(0, placeholderCharIndex) || 'Digite sua pergunta...'; },
-                            2000);
-                    }
-                };
-                recognition.onend = function() {
-                    stopListening();
-                };
-                recognition.onaudiostart = function() {};
-                recognition.onaudioend = function() {};
+    /* ─── SPEECH RECOGNITION ─── */
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR();
+        recognition.lang = 'pt-BR';
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+        recognition.onresult = function(e) {
+            let t = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
+            chatInput.value = t;
+            autoResizeTextarea();
+            chatInput.focus();
+        };
+        recognition.onerror = function(e) {
+            stopListening();
+            if (e.error === 'not-allowed') {
+                chatInput.placeholder = 'Permissão de microfone negada...';
+                setTimeout(() => { chatInput.placeholder = placeholderPhrases[phIdx].slice(0, phChar) || 'Faça sua pergunta...'; }, 2000);
             }
+        };
+        recognition.onend = stopListening;
+    }
 
-            function startListening() {
-                if (!recognition) {
-                    chatInput.placeholder = 'Microfone não suportado neste navegador...';
-                    setTimeout(() => { chatInput.placeholder = placeholderPhrases[placeholderIndex].substring(0,
-                            placeholderCharIndex) || 'Digite sua pergunta...'; }, 2500);
-                    return;
-                }
-                if (isListening) return;
-                isListening = true;
-                micBtn.classList.add('listening');
-                chatInput.placeholder = 'Ouvindo...';
-                try {
-                    recognition.start();
-                } catch (e) {
-                    stopListening();
-                }
+    function startListening() {
+        if (!recognition) return;
+        if (isListening) return;
+        isListening = true;
+        micBtn.classList.add('listening');
+        chatInput.placeholder = 'Ouvindo...';
+        try { recognition.start(); } catch(e) { stopListening(); }
+    }
+    function stopListening() {
+        isListening = false;
+        micBtn.classList.remove('listening');
+        chatInput.placeholder = placeholderPhrases[phIdx].slice(0, phChar) || 'Faça sua pergunta...';
+        if (recognition) { try { recognition.stop(); } catch(e) {} }
+    }
+    micBtn.addEventListener('click', function() { isListening ? stopListening() : startListening(); });
+
+    /* ─── SPLASH ─── */
+    function hideSplashScreen() {
+        splashScreen.classList.add('hidden');
+        chatInput.focus();
+    }
+    splashStartBtn.addEventListener('click', hideSplashScreen);
+    splashGoogleBtn.addEventListener('click', function() {
+        const orig = splashGoogleBtn.innerHTML;
+        splashGoogleBtn.innerHTML = '<span style="display:flex;align-items:center;gap:10px;"><span style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#8AB4F8;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></span> Conectando...</span>';
+        splashGoogleBtn.style.pointerEvents = 'none';
+        setTimeout(() => {
+            splashGoogleBtn.innerHTML = orig;
+            splashGoogleBtn.style.pointerEvents = 'auto';
+            hideSplashScreen();
+        }, 1500);
+    });
+    const spinStyle = document.createElement('style');
+    spinStyle.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(spinStyle);
+
+    /* ─── HEADER PLANS BTN ─── */
+    headerPlansBtn.addEventListener('click', function() { openModal('plans'); });
+
+    /* ─── SIDEBAR ─── */
+    function toggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        sidebar.classList.toggle('open', sidebarOpen);
+        sidebarOverlay.classList.toggle('active', sidebarOpen);
+        hamburger.classList.toggle('active', sidebarOpen);
+    }
+    function closeSidebar() {
+        if (!sidebarOpen) return;
+        sidebarOpen = false;
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        hamburger.classList.remove('active');
+    }
+    hamburger.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', closeSidebar);
+
+    sidebarNewChatBtn.addEventListener('click', function() {
+        closeSidebar();
+        chatHistory = [];
+        messagesArea.innerHTML = '';
+        welcomeScreen.classList.add('show');
+        messagesArea.appendChild(welcomeScreen);
+        hasMessages = false;
+    });
+    sidebarPlansBtn.addEventListener('click', function() { closeSidebar(); openModal('plans'); });
+
+    document.querySelectorAll('#sidebar .sidebar-chat-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            closeSidebar();
+            if (action === 'help') openModal('help');
+            if (action === 'calculator') openModal('calc');
+        });
+    });
+
+    /* ─── MODALS ─── */
+    function openModal(type) {
+        if (type === 'help')  modalHelpOverlay.classList.add('active');
+        if (type === 'calc')  modalCalcOverlay.classList.add('active');
+        if (type === 'plans') modalPlansOverlay.classList.add('active');
+    }
+    function closeModal(type) {
+        if (type === 'help')  modalHelpOverlay.classList.remove('active');
+        if (type === 'calc')  modalCalcOverlay.classList.remove('active');
+        if (type === 'plans') modalPlansOverlay.classList.remove('active');
+    }
+    function closeAllModals() {
+        ['help','calc','plans'].forEach(closeModal);
+    }
+
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close')));
+    });
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                if (this === modalHelpOverlay)  closeModal('help');
+                if (this === modalCalcOverlay)  closeModal('calc');
+                if (this === modalPlansOverlay) closeModal('plans');
             }
+        });
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { closeAllModals(); closeSidebar(); if (isListening) stopListening(); }
+    });
 
-            function stopListening() {
-                isListening = false;
-                micBtn.classList.remove('listening');
-                chatInput.placeholder = placeholderPhrases[placeholderIndex].substring(0, placeholderCharIndex) ||
-                    'Digite sua pergunta...';
-                if (recognition) {
-                    try { recognition.stop(); } catch (e) {}
-                }
+    /* ─── CLOCK ─── */
+    function updateClock() {
+        const n = new Date();
+        clockDisplay.textContent = [n.getHours(),n.getMinutes(),n.getSeconds()].map(v => String(v).padStart(2,'0')).join(':');
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    /* ─── CALCULATOR ─── */
+    function updateCalcDisplay() {
+        calcDisplay.textContent = (calcExpression === '' || calcExpression === '0') ? '0' : calcExpression;
+    }
+    function evaluateExpression(expr) {
+        let s = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+        s = s.replace(/[^0-9+\-*/().]/g,'');
+        if (!s.trim()) return '0';
+        try {
+            const r = new Function('return ' + s)();
+            if (isNaN(r) || !isFinite(r)) return 'Erro';
+            return Number.isInteger(Number(r)) ? String(r) : String(parseFloat(Number(r).toFixed(10)));
+        } catch(e) { return 'Erro'; }
+    }
+    document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const a = this.getAttribute('data-action');
+            if (a === 'clear') { calcExpression = ''; calcResultShown = false; updateCalcDisplay(); return; }
+            if (a === 'backspace') {
+                if (calcResultShown) { calcExpression = ''; calcResultShown = false; }
+                else calcExpression = calcExpression.slice(0,-1);
+                updateCalcDisplay(); return;
             }
+            if (a === '=') {
+                const r = evaluateExpression(calcExpression || '0');
+                calcDisplay.textContent = r; calcExpression = r; calcResultShown = true; return;
+            }
+            if (a === 'paren-open')  { if (calcResultShown) { calcExpression = ''; calcResultShown = false; } calcExpression += '('; updateCalcDisplay(); return; }
+            if (a === 'paren-close') { if (calcResultShown) { calcExpression = ''; calcResultShown = false; } calcExpression += ')'; updateCalcDisplay(); return; }
+            if (calcResultShown && /^[0-9]$/.test(a)) { calcExpression = ''; calcResultShown = false; }
+            if (calcResultShown && ['+','−','×','÷'].includes(a)) calcResultShown = false;
+            if (a === '.' && calcResultShown) { calcExpression = '0'; calcResultShown = false; }
+            const ops = ['+','−','×','÷'];
+            if (ops.includes(a) && ops.includes(calcExpression.slice(-1))) { calcExpression = calcExpression.slice(0,-1) + a; updateCalcDisplay(); return; }
+            calcExpression += a; updateCalcDisplay();
+        });
+    });
 
-            micBtn.addEventListener('click', function() {
-                if (isListening) {
-                    stopListening();
-                } else {
-                    startListening();
+    /* ─── SCROLL ─── */
+    function scrollToBottom() {
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    /* ─── MARKDOWN FORMATTER ─── */
+    function formatMarkdown(text) {
+        if (!text) return '';
+        let html = text;
+        html = html.replace(/`{3}([\s\S]*?)`{3}/g, '<pre><code>$1</code></pre>');
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        html = html.replace(/### (.+)/g, '<h3>$1</h3>');
+        html = html.replace(/## (.+)/g,  '<h2>$1</h2>');
+        html = html.replace(/# (.+)/g,   '<h2>$1</h2>');
+        const lines = html.split('\n');
+        let out = '', inUl = false, inOl = false;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (line === '') {
+                if (inUl) { out += '</ul>'; inUl = false; }
+                if (inOl) { out += '</ol>'; inOl = false; }
+                continue;
+            }
+            if (/^[-*]\s/.test(line)) {
+                if (!inUl) { out += '<ul>'; inUl = true; }
+                if (inOl)  { out += '</ol>'; inOl = false; }
+                out += '<li>' + line.replace(/^[-*]\s+/,'') + '</li>'; continue;
+            }
+            if (/^\d+\.\s/.test(line)) {
+                if (!inOl) { out += '<ol>'; inOl = true; }
+                if (inUl)  { out += '</ul>'; inUl = false; }
+                out += '<li>' + line.replace(/^\d+\.\s+/,'') + '</li>'; continue;
+            }
+            if (inUl) { out += '</ul>'; inUl = false; }
+            if (inOl) { out += '</ol>'; inOl = false; }
+            if (/^<(h[23]|pre)/.test(line)) out += line;
+            else out += '<p>' + line + '</p>';
+        }
+        if (inUl) out += '</ul>';
+        if (inOl) out += '</ol>';
+        return out;
+    }
+
+    /* ─── CREATE MESSAGE ELEMENT ─── */
+    function createMessageElement(content, sender) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper ' + sender;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = sender === 'ai' ? 'EM' : 'U';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+
+        if (sender === 'ai') {
+            bubble.innerHTML = formatMarkdown(content);
+
+            /* ACTION BAR */
+            const bar = document.createElement('div');
+            bar.className = 'message-actions';
+
+            /* Copy */
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'message-action-btn ripple-host';
+            copyBtn.title = 'Copiar'; copyBtn.setAttribute('aria-label','Copiar');
+            copyBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+            copyBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const txt = bubble.innerText || '';
+                navigator.clipboard.writeText(txt).then(() => {
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => copyBtn.classList.remove('copied'), 1200);
+                }).catch(()=>{});
+            });
+
+            /* Like */
+            const likeBtn = document.createElement('button');
+            likeBtn.className = 'message-action-btn ripple-host';
+            likeBtn.title = 'Gostei'; likeBtn.setAttribute('aria-label','Gostei');
+            likeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>';
+            likeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                likeBtn.classList.toggle('liked');
+                if (dislikeBtn.classList.contains('disliked')) dislikeBtn.classList.remove('disliked');
+            });
+
+            /* Dislike */
+            const dislikeBtn = document.createElement('button');
+            dislikeBtn.className = 'message-action-btn ripple-host';
+            dislikeBtn.title = 'Não gostei'; dislikeBtn.setAttribute('aria-label','Não gostei');
+            dislikeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>';
+            dislikeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dislikeBtn.classList.toggle('disliked');
+                if (likeBtn.classList.contains('liked')) likeBtn.classList.remove('liked');
+            });
+
+            /* Listen */
+            const listenBtn = document.createElement('button');
+            listenBtn.className = 'message-action-btn ripple-host';
+            listenBtn.title = 'Ouvir'; listenBtn.setAttribute('aria-label','Ouvir');
+            listenBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2 10v4a8 8 0 0016 0v-4"/><rect x="8" y="1" width="8" height="12" rx="4"/><line x1="12" y1="19" x2="12" y2="23"/></svg>';
+            listenBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utt = new SpeechSynthesisUtterance(bubble.innerText || '');
+                    utt.lang = 'pt-BR'; utt.rate = 1.1;
+                    window.speechSynthesis.speak(utt);
+                    listenBtn.style.color = 'var(--accent-blue)';
+                    utt.onend = () => { listenBtn.style.color = ''; };
                 }
             });
 
-            function hideSplashScreen() {
-                splashScreen.classList.add('hidden');
-                chatInput.focus();
-            }
+            bar.appendChild(copyBtn); bar.appendChild(likeBtn);
+            bar.appendChild(dislikeBtn); bar.appendChild(listenBtn);
+            bubble.appendChild(bar);
+        } else {
+            bubble.textContent = content;
+        }
 
-            splashStartBtn.addEventListener('click', function() {
-                hideSplashScreen();
+        wrapper.appendChild(avatar);
+        wrapper.appendChild(bubble);
+        return wrapper;
+    }
+
+    /* ─── ADD MESSAGE ─── */
+    function addMessage(content, sender) {
+        if (!hasMessages) {
+            welcomeScreen.classList.remove('show');
+            hasMessages = true;
+        }
+        const el = createMessageElement(content, sender);
+        messagesArea.appendChild(el);
+        scrollToBottom();
+        return el;
+    }
+
+    /* ─── TYPING INDICATOR ─── */
+    function showTypingIndicator() { typingIndicator.classList.add('active'); scrollToBottom(); }
+    function hideTypingIndicator() { typingIndicator.classList.remove('active'); }
+
+    /* ─── INITIAL MESSAGE ─── */
+    function addInitialMessage() {
+        const txt = 'Olá! Eu sou o Edy Marques.ai, sua inteligência artificial especializada em estudos para concursos, produtividade e aprendizado. Como posso ajudar você hoje?';
+        addMessage(txt, 'ai');
+        chatHistory.push({ role: 'assistant', content: txt });
+    }
+
+    /* ─── AUTO RESIZE TEXTAREA ─── */
+    function autoResizeTextarea() {
+        chatInput.style.height = 'auto';
+        const h = Math.min(chatInput.scrollHeight, 200);
+        chatInput.style.height = h + 'px';
+        chatInput.style.overflowY = chatInput.scrollHeight > 200 ? 'auto' : 'hidden';
+    }
+    chatInput.addEventListener('input', autoResizeTextarea);
+
+    /* ─── INPUT PADDING ADJUST ─── */
+    function adjustPadding() {
+        const inputArea = document.getElementById('input-area');
+        if (inputArea) {
+            messagesArea.style.paddingBottom = (inputArea.offsetHeight + 24) + 'px';
+        }
+    }
+    new ResizeObserver(adjustPadding).observe(document.getElementById('input-area'));
+    adjustPadding();
+
+    /* ─── KEYBOARD SEND ─── */
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    /* ─── SEND MESSAGE (BACKEND RESTAURADO) ─── */
+    async function sendMessage() {
+        if (isWaitingForResponse) return;
+        if (isListening) stopListening();
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        addMessage(message, 'user');
+        chatHistory.push({ role: 'user', content: message });
+        showTypingIndicator();
+        isWaitingForResponse = true;
+        sendBtn.disabled = true;
+
+        /* 🔁 INTEGRAÇÃO ORIGINAL COM O BACKEND GROQ */
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
+        const requestBody = { message: message, history: chatHistory.slice(0, -1) };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+                signal: controller.signal,
             });
-
-            splashGoogleBtn.addEventListener('click', function() {
-                const originalHTML = splashGoogleBtn.innerHTML;
-                splashGoogleBtn.innerHTML =
-                    '<span style="display:flex;align-items:center;gap:10px;"><span style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#5ce0d6;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></span> Conectando...</span>';
-                splashGoogleBtn.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    splashGoogleBtn.innerHTML = originalHTML;
-                    splashGoogleBtn.style.pointerEvents = 'auto';
-                    hideSplashScreen();
-                }, 1500);
-            });
-
-            const spinKeyframes = document.createElement('style');
-            spinKeyframes.textContent =
-                '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
-            document.head.appendChild(spinKeyframes);
-
-            function resizeCanvas() {
-                particlesCanvas.width = window.innerWidth;
-                particlesCanvas.height = window.innerHeight;
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error('API status ' + response.status);
+            const data = await response.json();
+            hideTypingIndicator();
+            if (data && data.response && typeof data.response === 'string' && data.response.trim()) {
+                addMessage(data.response.trim(), 'ai');
+                chatHistory.push({ role: 'assistant', content: data.response.trim() });
+            } else {
+                addMessage('Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?', 'ai');
+                chatHistory.push({ role: 'assistant', content: 'Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?' });
             }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+        } catch(err) {
+            clearTimeout(timeoutId);
+            hideTypingIndicator();
+            const msg = err.name === 'AbortError'
+                ? 'A resposta está demorando mais do que o esperado. Por favor, tente novamente.'
+                : 'Desculpe, estou temporariamente indisponível no momento. Por favor, tente novamente mais tarde.';
+            addMessage(msg, 'ai');
+            chatHistory.push({ role: 'assistant', content: msg });
+        } finally {
+            isWaitingForResponse = false;
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
 
-            const particles = [];
-            const particleCount = Math.min(70, Math.floor(window.innerWidth * window.innerHeight / 14000));
+    sendBtn.addEventListener('click', sendMessage);
 
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * particlesCanvas.width,
-                    y: Math.random() * particlesCanvas.height,
-                    vx: (Math.random() - 0.5) * 0.35,
-                    vy: (Math.random() - 0.5) * 0.35,
-                    radius: Math.random() * 1.8 + 0.6,
-                    baseRadius: Math.random() * 1.8 + 0.6,
-                    pulseSpeed: Math.random() * 0.015 + 0.005,
-                    pulseOffset: Math.random() * Math.PI * 2,
-                });
-            }
+    /* ─── BOTÃO PIX: ABRE CHECKOUT EM NOVA ABA (LINK PERSONALIZADO) ─── */
+    document.querySelectorAll('.payment-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open('https://dotaedy30-bit.github.io/meuShekallt/', '_blank');
+        });
+    });
 
-            function animateParticles() {
-                ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
-                const w = particlesCanvas.width;
-                const h = particlesCanvas.height;
+    /* ─── CLOSE SIDEBAR ON OUTSIDE CLICK ─── */
+    document.addEventListener('click', function(e) {
+        if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebarOpen) closeSidebar();
+    });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeSidebar(); });
 
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < -20) p.x = w + 20;
-                    if (p.x > w + 20) p.x = -20;
-                    if (p.y < -20) p.y = h + 20;
-                    if (p.y > h + 20) p.y = -20;
-                    p.radius = p.baseRadius + Math.sin(Date.now() * p.pulseSpeed + p.pulseOffset) * 0.7;
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(92,224,214,0.45)';
-                    ctx.fill();
-                    ctx.shadowColor = 'rgba(92,224,214,0.5)';
-                    ctx.shadowBlur = 7;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 100) {
-                            const alpha = (1 - dist / 100) * 0.26;
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(77,168,218,${alpha})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animateParticles);
-            }
-            animateParticles();
-
-            function toggleSidebar() {
-                sidebarOpen = !sidebarOpen;
-                if (sidebarOpen) {
-                    sidebar.classList.add('open');
-                    sidebarOverlay.classList.add('active');
-                    hamburger.classList.add('active');
-                } else {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                    hamburger.classList.remove('active');
-                }
-            }
-
-            function closeSidebar() {
-                if (sidebarOpen) {
-                    sidebarOpen = false;
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                    hamburger.classList.remove('active');
-                }
-            }
-
-            hamburger.addEventListener('click', toggleSidebar);
-            sidebarOverlay.addEventListener('click', closeSidebar);
-
-            document.querySelectorAll('#sidebar .sidebar-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const action = item.getAttribute('data-action');
-                    closeSidebar();
-                    if (action === 'help') openModal('help');
-                    if (action === 'calculator') openModal('calc');
-                    if (action === 'plans') openModal('plans');
-                });
-            });
-
-            function openModal(type) {
-                if (type === 'help') modalHelpOverlay.classList.add('active');
-                if (type === 'calc') modalCalcOverlay.classList.add('active');
-                if (type === 'plans') modalPlansOverlay.classList.add('active');
-            }
-
-            function closeModal(type) {
-                if (type === 'help') modalHelpOverlay.classList.remove('active');
-                if (type === 'calc') modalCalcOverlay.classList.remove('active');
-                if (type === 'plans') modalPlansOverlay.classList.remove('active');
-            }
-
-            function closeAllModals() {
-                modalHelpOverlay.classList.remove('active');
-                modalCalcOverlay.classList.remove('active');
-                modalPlansOverlay.classList.remove('active');
-            }
-
-            document.querySelectorAll('.modal-close').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const type = btn.getAttribute('data-close');
-                    closeModal(type);
-                });
-            });
-
-            document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        if (this === modalHelpOverlay) closeModal('help');
-                        if (this === modalCalcOverlay) closeModal('calc');
-                        if (this === modalPlansOverlay) closeModal('plans');
-                    }
-                });
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeAllModals();
-                    closeSidebar();
-                    if (isListening) stopListening();
-                }
-            });
-
-            function updateClock() {
-                const now = new Date();
-                const h = String(now.getHours()).padStart(2, '0');
-                const m = String(now.getMinutes()).padStart(2, '0');
-                const s = String(now.getSeconds()).padStart(2, '0');
-                clockDisplay.textContent = `${h}:${m}:${s}`;
-            }
-            updateClock();
-            setInterval(updateClock, 1000);
-
-            function updateCalcDisplay() {
-                if (calcExpression === '' || calcExpression === '0') {
-                    calcDisplay.textContent = '0';
-                } else {
-                    calcDisplay.textContent = calcExpression;
-                }
-            }
-
-            function evaluateExpression(expr) {
-                let sanitized = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
-                sanitized = sanitized.replace(/[^0-9+\-*/().]/g, '');
-                if (!sanitized || sanitized.trim() === '') return '0';
-                try {
-                    const result = new Function('return ' + sanitized)();
-                    if (isNaN(result) || !isFinite(result)) return 'Erro';
-                    let formatted = Number(result);
-                    if (Number.isInteger(formatted)) {
-                        return String(formatted);
-                    }
-                    return String(parseFloat(formatted.toFixed(10)));
-                } catch (e) {
-                    return 'Erro';
-                }
-            }
-
-            document.querySelectorAll('.calc-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const action = this.getAttribute('data-action');
-
-                    if (action === 'clear') {
-                        calcExpression = '';
-                        calcResultShown = false;
-                        updateCalcDisplay();
-                        return;
-                    }
-                    if (action === 'backspace') {
-                        if (calcResultShown) {
-                            calcExpression = '';
-                            calcResultShown = false;
-                        } else {
-                            calcExpression = calcExpression.slice(0, -1);
-                        }
-                        updateCalcDisplay();
-                        return;
-                    }
-                    if (action === '=') {
-                        const result = evaluateExpression(calcExpression || '0');
-                        calcDisplay.textContent = result;
-                        calcExpression = result;
-                        calcResultShown = true;
-                        return;
-                    }
-                    if (action === 'paren-open') {
-                        if (calcResultShown) { calcExpression = '';
-                            calcResultShown = false; }
-                        calcExpression += '(';
-                        updateCalcDisplay();
-                        return;
-                    }
-                    if (action === 'paren-close') {
-                        if (calcResultShown) { calcExpression = '';
-                            calcResultShown = false; }
-                        calcExpression += ')';
-                        updateCalcDisplay();
-                        return;
-                    }
-                    if (calcResultShown && /^[0-9]$/.test(action)) {
-                        calcExpression = '';
-                        calcResultShown = false;
-                    }
-                    if (calcResultShown && ['+', '−', '×', '÷'].includes(action)) {
-                        calcResultShown = false;
-                    }
-                    if (action === '.' && calcResultShown) {
-                        calcExpression = '0';
-                        calcResultShown = false;
-                    }
-                    const operators = ['+', '−', '×', '÷'];
-                    const lastChar = calcExpression.slice(-1);
-                    if (operators.includes(action) && operators.includes(lastChar)) {
-                        calcExpression = calcExpression.slice(0, -1) + action;
-                        updateCalcDisplay();
-                        return;
-                    }
-                    calcExpression += action;
-                    updateCalcDisplay();
-                });
-            });
-
-            function scrollToBottom() {
-                const lastMsg = messagesArea.lastElementChild;
-                if (lastMsg) {
-                    lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-                messagesArea.scrollTop = messagesArea.scrollHeight;
-            }
-
-            function createMessageElement(content, sender) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'message-wrapper ' + sender;
-
-                const avatar = document.createElement('div');
-                avatar.className = 'message-avatar';
-                avatar.textContent = sender === 'ai' ? 'EM' : 'U';
-
-                const bubble = document.createElement('div');
-                bubble.className = 'message-bubble';
-                bubble.textContent = content;
-
-                wrapper.appendChild(avatar);
-                wrapper.appendChild(bubble);
-                return wrapper;
-            }
-
-            function addMessage(content, sender) {
-                const msgEl = createMessageElement(content, sender);
-                messagesArea.appendChild(msgEl);
-                scrollToBottom();
-                return msgEl;
-            }
-
-            function showTypingIndicator() {
-                typingIndicator.classList.add('active');
-                scrollToBottom();
-            }
-
-            function hideTypingIndicator() {
-                typingIndicator.classList.remove('active');
-            }
-
-            function addInitialMessage() {
-                const initialText =
-                    'Olá! Eu sou o Edy Marques.ai, sua inteligência artificial especializada em estudos para concursos, produtividade e aprendizado. Como posso ajudar você hoje?';
-                addMessage(initialText, 'ai');
-                chatHistory.push({ role: 'assistant', content: initialText });
-            }
-
-            async function sendMessage() {
-                if (isWaitingForResponse) return;
-                if (isListening) stopListening();
-                const message = chatInput.value.trim();
-                if (!message) return;
-
-                chatInput.value = '';
-                addMessage(message, 'user');
-                chatHistory.push({ role: 'user', content: message });
-                showTypingIndicator();
-                isWaitingForResponse = true;
-                sendBtn.style.opacity = '0.5';
-                sendBtn.style.pointerEvents = 'none';
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 18000);
-
-                const requestBody = {
-                    message: message,
-                    history: chatHistory.slice(0, -1)
-                };
-
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(requestBody),
-                        signal: controller.signal,
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error('API respondeu com status ' + response.status);
-                    }
-
-                    const data = await response.json();
-                    hideTypingIndicator();
-
-                    if (data && data.response && typeof data.response === 'string' && data.response.trim()) {
-                        addMessage(data.response.trim(), 'ai');
-                        chatHistory.push({ role: 'assistant', content: data.response.trim() });
-                    } else {
-                        addMessage(
-                            'Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?',
-                            'ai');
-                        chatHistory.push({ role: 'assistant', content: 'Desculpe, recebi uma resposta inesperada. Poderia reformular sua pergunta?' });
-                    }
-                } catch (err) {
-                    clearTimeout(timeoutId);
-                    hideTypingIndicator();
-                    console.error('Erro na requisição:', err);
-                    let errorMsg =
-                        'Desculpe, estou temporariamente indisponível no momento. Por favor, tente novamente mais tarde.';
-                    if (err.name === 'AbortError') {
-                        errorMsg =
-                            'A resposta está demorando mais do que o esperado. Por favor, tente novamente.';
-                    }
-                    addMessage(errorMsg, 'ai');
-                    chatHistory.push({ role: 'assistant', content: errorMsg });
-                } finally {
-                    isWaitingForResponse = false;
-                    sendBtn.style.opacity = '1';
-                    sendBtn.style.pointerEvents = 'auto';
-                    chatInput.focus();
-                }
-            }
-
-            sendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            document.querySelectorAll('.payment-btn').forEach(btn => {
-                if (btn.disabled) return;
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const originalHTML = this.innerHTML;
-                    const originalBg = this.style.background;
-                    this.innerHTML =
-                        '<span style="display:flex;align-items:center;gap:6px;">Simulado!</span>';
-                    this.style.borderColor = 'rgba(92,224,214,0.7)';
-                    this.style.boxShadow = '0 0 25px rgba(92,224,214,0.5)';
-                    this.style.pointerEvents = 'none';
-                    setTimeout(() => {
-                        this.innerHTML = originalHTML;
-                        this.style.borderColor = '';
-                        this.style.boxShadow = '';
-                        this.style.pointerEvents = 'auto';
-                        this.style.background = originalBg || '';
-                    }, 1800);
-                });
-            });
-
-            addInitialMessage();
-
-            document.addEventListener('click', function(e) {
-                if (!sidebar.contains(e.target) && e.target !== hamburger && !hamburger.contains(e
-                        .target) && sidebarOpen) {
-                    closeSidebar();
-                }
-            });
-
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768 && sidebarOpen) {
-                    closeSidebar();
-                }
-            });
-        })();
-    </script>
+    /* ─── BOOT ─── */
+    addInitialMessage();
+})();
+</script>
 </body>
 </html>
